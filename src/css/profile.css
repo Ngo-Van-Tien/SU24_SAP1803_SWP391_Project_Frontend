@@ -1,0 +1,36 @@
+.name-wrap {
+  display: flex;
+}
+
+input {
+  background: #f8fafa none repeat scroll 0 0;
+  border: 1px solid #eaeaea;
+  border-radius: 7px;
+  color: #535165;
+  font-size: 13px;
+  margin-bottom: 20px;
+  padding: 12px 20px;
+  width: 100%;
+}
+
+.name-wrap input:first-child{
+	margin-right: 20px;
+}
+
+.main-btn{
+	border:none;
+	background-color: #62a1e4;
+	padding:10px 20px;
+	border-radius: 10px
+}
+
+.btn-setAdmin{
+	color: black !important;
+	padding:  5px 10px;
+	background-color: #d7e6ff;
+	text-decoration: none  !important;
+	border-radius: 10px
+}
+.error{
+	color: red;
+}
