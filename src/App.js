@@ -1,10 +1,16 @@
 import "./App.css";
 import Login from "./Components/Login/Login";
 import Profile from "./Components/Management_Account/Profile";
-import Events from "./Components/Management_School/Management_EventInSchool/Events";
-import Group from "./Components/Management_School/Management_Group/Group";
-import News from "./Components/Management_School/Management_NewsInSchool/News";
-import Schools from "./Components/Management_School/School";
+import Events from "./Components/Management_Swp/Management_Company/Events";
+import Group from "./Components/Management_Swp/Management_Group/Group";
+import News from "./Components/Management_Swp/Management_NewsInBrand/News";
+import Schools from "./Components/Management_Swp/ProductItems";
+import Brand from "./Components/Management_Swp/Management_Brand/Brand";
+import Product from "./Components/Management_Swp/Management_Products/Product";
+import Account from "./Components/Management_Swp/Management_Account/Account";
+import MilkFuncion from "./Components/Management_Swp/Management_MilkFuncion/MilkFuncion";
+import Nutrient from "./Components/Management_Swp/Management_Nutrient/Nutrient";
+
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
@@ -31,6 +37,12 @@ function App() {
         <Route path="/events" component={Events} />
         <Route path="/news" component={News} />
         <Route path="/group" component={Group} />
+        <Route path="/brand" component={Brand} />
+        <Route path="/product" component={Product} />
+        <Route path="/account" component={Account} />
+        <Route path="/milkfuncion" component={MilkFuncion} />
+        <Route path="/nutrient" component={Nutrient} />
+        
       </div>
     </Router>
     // <Router>

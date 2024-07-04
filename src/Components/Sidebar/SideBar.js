@@ -85,7 +85,45 @@ export default function SideBar() {
                     <polygon points="12 15 17 21 7 21 12 15" />
                   </svg>
                 </i>
-                Quản lý Công ty
+                Quản lý công ty
+              </a>
+            </Link>
+          </li>
+          <li
+            onClick={() => {
+              let element = document.getElementById(activeId);
+              element.classList.remove("active");
+              document.getElementById("txtGroup").classList.add("active");
+              setActiveId("txtGroup");
+            }}
+            id="txtGroup"
+          >
+            <Link to="/brand">
+              <a
+                classNamestyle={{
+                  cursor: "pointer",
+                }}
+                title
+              >
+                <i className>
+                  <svg
+                    id="ab4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={14}
+                    height={14}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="feather feather-airplay"
+                  >
+                    <path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1" />
+                    <polygon points="12 15 17 21 7 21 12 15" />
+                  </svg>
+                </i>
+                Quản lý thương hiệu
               </a>
             </Link>
           </li>
@@ -125,9 +163,40 @@ export default function SideBar() {
                     <path d="M16 10a4 4 0 0 1-8 0" />
                   </svg>
                 </i>
-                Quản lý Hãng Sữa
+                Dòng sữa của thương hiệu
               </a>
             </Link>
+
+            <Link to="/milkfuncion">
+              <a
+                classNamestyle={{
+                  cursor: "pointer",
+                }}
+                title
+              >
+                <i className>
+                  <svg
+                    id="ab5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={14}
+                    height={14}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="feather feather-shopping-bag"
+                  >
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                    <line x1={3} y1={6} x2={21} y2={6} />
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+                  </svg>
+                </i>
+                Quản lý dòng sữa
+              </a>
+            </Link>
+
           </li>
           <li
             onClick={() => {
@@ -139,7 +208,7 @@ export default function SideBar() {
             id="txtAccount"
             className
           >
-            <Link to="/profile">
+            <Link to="/Account">
               <a
                 className
                 style={{
@@ -182,7 +251,9 @@ export default function SideBar() {
             id="txtNews"
             className
           >
-            <Link to="/news">
+           
+
+            <Link to="/nutrient">
               <a
                 classNamestyle={{
                   cursor: "pointer",
@@ -209,7 +280,49 @@ export default function SideBar() {
                     <line x1={14} y1={1} x2={14} y2={4} />
                   </svg>
                 </i>
-                Quản lý Bài News
+                Quản lý chất dinh dưỡng
+              </a>
+            </Link>
+
+          </li>
+          <li
+            onClick={() => {
+              let element = document.getElementById(activeId);
+              element.classList.remove("active");
+              document.getElementById("txtNews").classList.add("active");
+              setActiveId("txtNews");
+            }}
+            id="txtNews"
+            className
+          >
+            <Link to="/product">
+              <a
+                classNamestyle={{
+                  cursor: "pointer",
+                }}
+                title
+              >
+                <i className>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={14}
+                    height={14}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="feather feather-coffee"
+                  >
+                    <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                    <line x1={6} y1={1} x2={6} y2={4} />
+                    <line x1={10} y1={1} x2={10} y2={4} />
+                    <line x1={14} y1={1} x2={14} y2={4} />
+                  </svg>
+                </i>
+                Quản lý sản phẩm
               </a>
             </Link>
           </li>
@@ -223,33 +336,7 @@ export default function SideBar() {
             id="txtSchoolYear"
             className
           >
-            <Link to="/news">
-              <a
-                classNamestyle={{
-                  cursor: "pointer",
-                }}
-                title
-              >
-                <i className>
-                  <svg
-                    id="ab2"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width={14}
-                    height={14}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="feather feather-message-square"
-                  >
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
-                </i>
-                Quản lý Niên Khóa
-              </a>
-            </Link>
+      
           </li>
 
           {/* <li className>

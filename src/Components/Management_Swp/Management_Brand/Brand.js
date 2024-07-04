@@ -1,9 +1,9 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import SideBar from "../../Sidebar/SideBar";
-import { Country } from "../../Country";
+import ReactDOM from 'react-dom';
 
-export default function Group() {
+export default function Brand() {
   const [groups, setGroups] = useState([]);
   const [schools, setSchools] = useState([]);
   const [stateAdd, setStateAdd] = useState("Create");
@@ -13,7 +13,7 @@ export default function Group() {
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
 
   useEffect(async () => {
-    getAllSchool();
+    await getAllSchool();
     await getAllGroups();
   }, []);
 
@@ -30,57 +30,15 @@ export default function Group() {
   };
   const addGroup = async () => {
     if (
-      document.getElementById("txtSelectCountry").value != "Chọn quốc gia"
-    ) {
-        try {
-          const data = {
-            Name: document.getElementById("txtName").value,
-            Description: document.getElementById("txtDesciption").value,
-            Nation: document.getElementById("txtSelectCountry").value
-          };
-          const formData = new FormData();
-          formData.append('Name', document.getElementById("txtName").value);  
-          formData.append('Description', document.getElementById("txtDesciption").value); 
-          formData.append('Nation', document.getElementById("txtSelectCountry").value); 
-          console.log(data)
-          const response = await axios.post(
-            "http://localhost:5106/api/Company/AddCompany",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data"
-              },
-            }
-          );
-          if (response.status === 200) {
-            await getAllGroups();
-            alert("Tạo company thành công");
-            setStateAdd("Create");
-            document.getElementById("txtName").value = "";
-            document.getElementById("txtDesciption").value = "";
-            var elementTest = document.getElementById("post-new");
-            elementTest.classList.remove("active");
-          }
-        } catch (err) {
-          console.error(err);
-        }
-    } else {
-      alert("Có lỗi rồi");
-    }
-  };
-  const updateGroup = async () => {
-    if (
-      document.getElementById("txtSelectCountry").value != "Chọn quốc gia"
+      document.getElementById("txtSelectCountry").value != "Chọn công ty"
     ) {
       try {
         const formData = new FormData();
-          formData.append('Id', schoolEdit); 
-          formData.append('Name', document.getElementById("txtName").value);  
-          formData.append('Description', document.getElementById("txtDesciption").value); 
-          formData.append('Nation', document.getElementById("txtSelectCountry").value); 
-          console.log(schoolEdit)
-        const response = await axios.put(
-          `http://localhost:5106/api/Company/UpdateCompany`,
+        formData.append('Name', document.getElementById("txtName").value);
+        formData.append('Description', document.getElementById("txtDesciption").value);
+        formData.append('CompanyId', document.getElementById("txtSelectCountry").value);
+        const response = await axios.post(
+          "http://localhost:5106/api/MilkBrand/AddMilkBrand",
           formData,
           {
             headers: {
@@ -90,12 +48,10 @@ export default function Group() {
         );
         if (response.status === 200) {
           await getAllGroups();
-          alert("Cập nhập công ty thành công ");
-          
+          alert("Tạo thương hiệu thành công");
           setStateAdd("Create");
           document.getElementById("txtName").value = "";
           document.getElementById("txtDesciption").value = "";
-          document.getElementById("txtSelectCountry").value = "";
           var elementTest = document.getElementById("post-new");
           elementTest.classList.remove("active");
         }
@@ -103,13 +59,74 @@ export default function Group() {
         console.error(err);
       }
     } else {
-      alert("Chọn quốc gia");
+      alert("Có lỗi rồi");
+    }
+  };
+  const updateGroup = async () => {
+    if (
+      document.getElementById("txtSelectCountry").value != "Chọn trường" &&
+      document.getElementById("txtSelectSchoolYear").value != ""
+    ) {
+      let avtImg = null;
+      let bgImg = null;
+
+      for (let i = 0; i < imgNotSave.length; i++) {
+        if (imgNotSave[i].type == "avatar") {
+          avtImg = await saveImgInImgBB(imgNotSave[i].img);
+        } else {
+          bgImg = await saveImgInImgBB(imgNotSave[i].img);
+        }
+      }
+
+      if (avtImg == null) {
+        avtImg = groupRecent.avataImg;
+      }
+      if (bgImg == null) {
+        bgImg = groupRecent.backgroundImg;
+      }
+      try {
+        const data = {
+          name: document.getElementById("txtName").value,
+          schoolYearId: document.getElementById("txtSelectSchoolYear").value,
+          policy: document.getElementById("txtPolicy").value,
+          backgroundImg: bgImg,
+          avataImg: avtImg,
+          description: document.getElementById("txtDesciption").value,
+          info: document.getElementById("txtInfomation").value,
+          groupAdminId:
+            groupRecent.groupAdminId != null ? groupRecent.groupAdminId : null,
+        };
+        const response = await axios.put(
+          `https://truongxuaapp.online/api/v1/groups?id=${groupRecent.id}`,
+          data,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.authorization,
+            },
+          }
+        );
+        if (response.status === 200) {
+          await getAllGroups();
+          alert("Cập nhập nhóm thành công ");
+          setImgNotSave([]);
+          setStateAdd("Create");
+          document.getElementById("txtName").value = "";
+          document.getElementById("txtDesciption").value = "";
+          var elementTest = document.getElementById("post-new");
+          elementTest.classList.remove("active");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    } else {
+      alert("Chọn trường và niên khóa phù hợp");
     }
   };
   const getGroupRecent = async (id) => {
     try {
       const response = await axios.get(
-        `http://localhost:5106/api/Company/GetById/getbyid?id=${id}`,
+        `https://truongxuaapp.online/api/v1/groups/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -122,9 +139,9 @@ export default function Group() {
         document.getElementById("txtName").value = response.data.name;
         document.getElementById("txtDesciption").value =
           response.data.description;
-          document.getElementById("txtSelectCountry").value = response.data.nation;
+        document.getElementById("txtSelectCountry").value = response.data.nation;
         setSchoolEdit(id);
-         getAllSchool();
+        await getAllSchool();
       }
     } catch (err) {
       console.error(err);
@@ -171,9 +188,20 @@ export default function Group() {
       console.error(err);
     }
   };
-  const getAllSchool = () => {
-    setSchools(Country);
+
+  const getAllSchool = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5106/api/Company/GetAllCompany"
+      );
+      if (response.status === 200) {
+        setSchools(response.data.data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
+
   const renderAllSchool = (selectIndex) => {
     return schools.map((element, index) => {
       if (selectIndex == undefined) {
@@ -204,10 +232,10 @@ export default function Group() {
   const getAllGroups = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5106/api/Company/GetAllCompany",
+        "http://localhost:5106/api/MilkBrand/GetAllMilkBrand",
         {
           headers: {
-            "Content-Type": "application/json"
+           "Content-Type": "multipart/form-data"
           },
         }
       );
@@ -273,6 +301,24 @@ export default function Group() {
       console.error(err);
     }
   };
+
+  const [brandFunction, setBrandFuction] = useState()
+  const [brandFunctions, setBrandFuctions] = useState([])
+  const deleteFunction = (index) => {
+    const updatedFunctions = [...brandFunctions];
+    updatedFunctions.splice(index, 1);
+    setBrandFuctions(updatedFunctions);
+  };
+  const addFunction = (e) => {
+    e.preventDefault();
+    if (brandFunction != null && brandFunction != "") {
+      setBrandFuctions(brandFunctions => [...brandFunctions, brandFunction])
+      console.log(brandFunctions)
+      console.log(brandFunction)
+      setBrandFuction("")
+    }
+  }
+
   const deleteCommentInPost = async (idComment) => {
     try {
       const response = await axios.delete(
@@ -312,7 +358,7 @@ export default function Group() {
   const deleteAGroup = async (idGroup) => {
     try {
       const response = await axios.delete(
-        `http://localhost:5106/api/Company/DeleteCompany?id=${idGroup}`
+        `http://localhost:5106/api/MilkBrand/DeleteMilkBrand?id=${idGroup}`
       );
       if (response.status === 200) {
         document.getElementById("delete-post").classList.remove("active");
@@ -329,9 +375,9 @@ export default function Group() {
         <tr key={index}>
           <td>{element.id}</td>
           <td>{element.name}</td>
-          <td className="text-success">{element.description}</td>
-          <td>{element.nation}</td>
+          <td>{element.company.name}</td>
 
+          <td className="text-success">{element.description}</td>
           <td>
             <div
               onClick={() => {
@@ -723,7 +769,7 @@ export default function Group() {
         <div className="row">
           <div className="col-lg-12">
             <div className="panel-content">
-              <h4 className="main-title">Quản lý công ty</h4>
+              <h4 className="main-title">Quản lý thương hiệu</h4>
               <button
                 className="main-btn"
                 onClick={() => {
@@ -740,7 +786,7 @@ export default function Group() {
                   marginBottom: 26,
                 }}
               >
-                Tạo Công ty
+                Tạo Thương Hiệu
               </button>
               <div className="row merged20 mb-4">
                 <div className="col-lg-12">
@@ -752,9 +798,9 @@ export default function Group() {
                       <thead>
                         <tr>
                           <th>ID#</th>
-                          <th>Tên công ty</th>
-                          <th>Mô Tả</th>
-                          <th>Quốc Gia</th>
+                          <th>Tên Thương Hiệu</th>
+                          <th>Tên Công Ty</th>
+                          <th>Description</th>
                           <th>Edit</th>
                         </tr>
                       </thead>
@@ -766,13 +812,13 @@ export default function Group() {
               <div className="row merged20 mb-4">
                 <div className="col-lg-6">
                   <div className="d-widget">
-                   
-                   
+
+
                   </div>
                 </div>
-              
+
               </div>
-            
+
             </div>
           </div>
         </div>
@@ -1017,7 +1063,7 @@ export default function Group() {
                   }}
                   id="popup-head-name"
                 >
-                  Tạo công ty
+                  Tạo thương hiệu
                 </p>
               </h5>
             </div>
@@ -1040,7 +1086,7 @@ export default function Group() {
                     width: "20%",
                   }}
                 >
-                  Chọn quốc gia:{" "}
+                  Chọn công ty:{" "}
                 </p>
                 <select
                   onChange={onChangeSelect}
@@ -1051,7 +1097,7 @@ export default function Group() {
                     marginRight: 10,
                   }}
                 >
-                  <option>Chọn quốc gia</option>
+                  <option>Chọn công ty</option>
                   {stateAdd == "Create"
                     ? renderAllSchool()
                     : renderAllSchool(schoolEdit)}
@@ -1071,11 +1117,11 @@ export default function Group() {
                     width: "20%",
                   }}
                 >
-                  Tên công ty:{" "}
+                  Tên thương hiệu:{" "}
                 </p>
                 <input
                   required
-                  placeholder="Tên của công ty"
+                  placeholder="Tên của thương hiệu"
                   style={{
                     width: "100%",
                     padding: 10,
@@ -1090,7 +1136,7 @@ export default function Group() {
                   alignItems: "baseline",
                 }}
               >
-              
+
               </div>
               <div
                 style={{
@@ -1110,14 +1156,46 @@ export default function Group() {
                 </p>
                 <input
                   required
-                  placeholder="Mô tả của nhóm"
+                  placeholder="Mô tả của thương hiệu"
                   style={{
                     width: "100%",
                     padding: 10,
                   }}
                   id="txtDesciption"
                 />
+
+
+
+
+
               </div>
+              
+              <div  >
+            <ul>
+        {brandFunctions.map((func, index) => (
+          <li key={index}>
+            {func}
+            <button onClick={() => deleteFunction(index)}>
+              {/* Icon Delete using Unicode or SVG */}
+              <svg
+                onClick={() => deleteFunction(index)}
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                className="bi bi-x"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10.354 5.354a.5.5 0 0 1 0 .708L8.707 8l1.647 1.646a.5.5 0 0 1-.708.708L8 8.707 6.354 10.354a.5.5 0 0 1-.708-.708L7.293 8 5.646 6.354a.5.5 0 0 1 .708-.708L8 7.293l1.646-1.647a.5.5 0 0 1 .708 0z"
+                />
+              </svg>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
               <button
                 className="main-btn"
                 style={{
@@ -1131,7 +1209,7 @@ export default function Group() {
                   marginRight: "auto",
                 }}
               >
-                { stateAdd == "Create" ? "Tạo Công Ty" : "Cập nhật" }
+                Tạo Thương Hiệu
               </button>
             </form>
           </div>
@@ -1157,7 +1235,7 @@ export default function Group() {
                   }}
                   id="popup-head-name"
                 >
-                  Bạn có chắn muốn xóa công ty này ?
+                  Bạn có chắn muốn xóa thương hiệu này ?
                 </p>
               </h5>
             </div>

@@ -1176,17 +1176,18 @@ export default function Events() {
                 <div className="col-lg-12">
                   <div className="d-widget">
                     <div className="d-widget-title">
-                      <h5>Tất cả sự kiện</h5>
+                      <h5>Tất cả sản phẩm</h5>
                     </div>
                     <table className="table table-default all-events table-striped table-responsive-lg">
                       <thead>
                         <tr>
                           <th>ID#</th>
-                          <th>Id trường</th>
-                          <th>Tên event</th>
-                          <th>Ngày tạo </th>
-                          <th>Giá vé</th>
-                          <th>Tùy chọn</th>
+                          <th>Tên Sản Phẩm</th>
+                          <th>Thông Tin</th>
+                          <th>Khoảng tuổi</th>
+                          <th>Thương Hiệu Sữa</th>
+                          <th>Hình Anh</th>
+                          <th>Edit</th>
                         </tr>
                       </thead>
                       <tbody>{renderEvent()}</tbody>

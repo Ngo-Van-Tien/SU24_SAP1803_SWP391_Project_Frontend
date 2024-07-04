@@ -1,9 +1,8 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import SideBar from "../../Sidebar/SideBar";
-import { Country } from "../../Country";
 
-export default function Group() {
+export default function Product() {
   const [groups, setGroups] = useState([]);
   const [schools, setSchools] = useState([]);
   const [stateAdd, setStateAdd] = useState("Create");
@@ -13,7 +12,7 @@ export default function Group() {
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
 
   useEffect(async () => {
-    getAllSchool();
+    await getAllSchool();
     await getAllGroups();
   }, []);
 
@@ -29,58 +28,26 @@ export default function Group() {
     }
   };
   const addGroup = async () => {
-    if (
-      document.getElementById("txtSelectCountry").value != "Chọn quốc gia"
-    ) {
-        try {
-          const data = {
-            Name: document.getElementById("txtName").value,
-            Description: document.getElementById("txtDesciption").value,
-            Nation: document.getElementById("txtSelectCountry").value
-          };
-          const formData = new FormData();
-          formData.append('Name', document.getElementById("txtName").value);  
-          formData.append('Description', document.getElementById("txtDesciption").value); 
-          formData.append('Nation', document.getElementById("txtSelectCountry").value); 
-          console.log(data)
-          const response = await axios.post(
-            "http://localhost:5106/api/Company/AddCompany",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data"
-              },
-            }
-          );
-          if (response.status === 200) {
-            await getAllGroups();
-            alert("Tạo company thành công");
-            setStateAdd("Create");
-            document.getElementById("txtName").value = "";
-            document.getElementById("txtDesciption").value = "";
-            var elementTest = document.getElementById("post-new");
-            elementTest.classList.remove("active");
-          }
-        } catch (err) {
-          console.error(err);
-        }
-    } else {
-      alert("Có lỗi rồi");
-    }
-  };
-  const updateGroup = async () => {
-    if (
-      document.getElementById("txtSelectCountry").value != "Chọn quốc gia"
-    ) {
+    console.log("jjjjjjj")
+    if (document.getElementById("txtMilkBrandId").value !== "Chọn thương hiệu") {
       try {
+       
         const formData = new FormData();
-          formData.append('Id', schoolEdit); 
-          formData.append('Name', document.getElementById("txtName").value);  
-          formData.append('Description', document.getElementById("txtDesciption").value); 
-          formData.append('Nation', document.getElementById("txtSelectCountry").value); 
-          console.log(schoolEdit)
-        const response = await axios.put(
-          `http://localhost:5106/api/Company/UpdateCompany`,
+        formData.append('MilkBrandId', document.getElementById("txtMilkBrandId").value);
+        formData.append('Name', document.getElementById("txtName").value);
+        formData.append('Description', document.getElementById("txtDesciption").value);
+        formData.append('startAge', document.getElementById("txtstartAge").value);
+        formData.append('endAge', document.getElementById("txtendAge").value);
+
+        
+        // Lấy tệp hình ảnh từ input
+        const imageInput = document.getElementById("txtImage");
+        if (imageInput.files.length > 0) {
+          formData.append('Image', imageInput.files[0]);
+        }
+        
+        const response = await axios.post(
+          "https://localhost:7043/api/Product/addproduct",
           formData,
           {
             headers: {
@@ -90,12 +57,14 @@ export default function Group() {
         );
         if (response.status === 200) {
           await getAllGroups();
-          alert("Cập nhập công ty thành công ");
-          
+          alert("Tạo sản phẩm thành công");
           setStateAdd("Create");
+          
           document.getElementById("txtName").value = "";
           document.getElementById("txtDesciption").value = "";
-          document.getElementById("txtSelectCountry").value = "";
+          document.getElementById("txtstartAge").value = "";
+          document.getElementById("txtendAge").value = "";
+          document.getElementById("txtImage").value = ""; // Xóa giá trị của input hình ảnh
           var elementTest = document.getElementById("post-new");
           elementTest.classList.remove("active");
         }
@@ -103,13 +72,74 @@ export default function Group() {
         console.error(err);
       }
     } else {
-      alert("Chọn quốc gia");
+      alert("Có lỗi rồi");
+    }
+  };
+  const updateGroup = async () => {
+    if (
+      document.getElementById("txtSelectCountry").value != "Chọn trường" &&
+      document.getElementById("txtSelectSchoolYear").value != ""
+    ) {
+      let avtImg = null;
+      let bgImg = null;
+
+      for (let i = 0; i < imgNotSave.length; i++) {
+        if (imgNotSave[i].type == "avatar") {
+          avtImg = await saveImgInImgBB(imgNotSave[i].img);
+        } else {
+          bgImg = await saveImgInImgBB(imgNotSave[i].img);
+        }
+      }
+
+      if (avtImg == null) {
+        avtImg = groupRecent.avataImg;
+      }
+      if (bgImg == null) {
+        bgImg = groupRecent.backgroundImg;
+      }
+      try {
+        const data = {
+          name: document.getElementById("txtName").value,
+          schoolYearId: document.getElementById("txtSelectSchoolYear").value,
+          policy: document.getElementById("txtPolicy").value,
+          backgroundImg: bgImg,
+          avataImg: avtImg,
+          description: document.getElementById("txtDesciption").value,
+          info: document.getElementById("txtInfomation").value,
+          groupAdminId:
+            groupRecent.groupAdminId != null ? groupRecent.groupAdminId : null,
+        };
+        const response = await axios.put(
+          `https://truongxuaapp.online/api/v1/groups?id=${groupRecent.id}`,
+          data,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.authorization,
+            },
+          }
+        );
+        if (response.status === 200) {
+          await getAllGroups();
+          alert("Cập nhập nhóm thành công ");
+          setImgNotSave([]);
+          setStateAdd("Create");
+          document.getElementById("txtName").value = "";
+          document.getElementById("txtDesciption").value = "";
+          var elementTest = document.getElementById("post-new");
+          elementTest.classList.remove("active");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    } else {
+      alert("Chọn trường và niên khóa phù hợp");
     }
   };
   const getGroupRecent = async (id) => {
     try {
       const response = await axios.get(
-        `http://localhost:5106/api/Company/GetById/getbyid?id=${id}`,
+        `https://truongxuaapp.online/api/v1/groups/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -122,9 +152,9 @@ export default function Group() {
         document.getElementById("txtName").value = response.data.name;
         document.getElementById("txtDesciption").value =
           response.data.description;
-          document.getElementById("txtSelectCountry").value = response.data.nation;
+        document.getElementById("txtSelectCountry").value = response.data.nation;
         setSchoolEdit(id);
-         getAllSchool();
+        await getAllSchool();
       }
     } catch (err) {
       console.error(err);
@@ -171,9 +201,21 @@ export default function Group() {
       console.error(err);
     }
   };
-  const getAllSchool = () => {
-    setSchools(Country);
+
+  const getAllSchool = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5106/api/Product/GetAllProduct"
+      );
+      if (response.status === 200) {
+        console.log(response.data)
+        setSchools(response.data.data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
+
   const renderAllSchool = (selectIndex) => {
     return schools.map((element, index) => {
       if (selectIndex == undefined) {
@@ -204,7 +246,7 @@ export default function Group() {
   const getAllGroups = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5106/api/Company/GetAllCompany",
+        "http://localhost:5106/api/Product/GetAllProduct",
         {
           headers: {
             "Content-Type": "application/json"
@@ -212,6 +254,7 @@ export default function Group() {
         }
       );
       if (response.status === 200) {
+        console.log(response.data.data)
         setGroups(response.data.data);
       }
     } catch (err) {
@@ -312,7 +355,7 @@ export default function Group() {
   const deleteAGroup = async (idGroup) => {
     try {
       const response = await axios.delete(
-        `http://localhost:5106/api/Company/DeleteCompany?id=${idGroup}`
+        `https://localhost:7043/api/MilkBrand/delete milk brand?Id=${idGroup}`
       );
       if (response.status === 200) {
         document.getElementById("delete-post").classList.remove("active");
@@ -329,8 +372,19 @@ export default function Group() {
         <tr key={index}>
           <td>{element.id}</td>
           <td>{element.name}</td>
-          <td className="text-success">{element.description}</td>
-          <td>{element.nation}</td>
+          <td>{element.description}</td>
+          <td>{element.startAge}</td>
+          <td>{element.endAge}</td>
+          <td>{element.milkBrand.name}</td>
+          <td>
+            {element.image && (
+              <img
+                src={`data:image/png;base64, ${element.image.content}`}
+                alt="Product Image"
+                style={{ width: '50px', height: '50px' }} // Adjust the width and height as needed
+              />
+            )}
+          </td>
 
           <td>
             <div
@@ -723,7 +777,7 @@ export default function Group() {
         <div className="row">
           <div className="col-lg-12">
             <div className="panel-content">
-              <h4 className="main-title">Quản lý công ty</h4>
+              <h4 className="main-title">Quản lý Sản Phẩm</h4>
               <button
                 className="main-btn"
                 onClick={() => {
@@ -740,21 +794,24 @@ export default function Group() {
                   marginBottom: 26,
                 }}
               >
-                Tạo Công ty
+                Tạo Sản Phẩm
               </button>
               <div className="row merged20 mb-4">
                 <div className="col-lg-12">
                   <div className="d-widget">
                     <div className="d-widget-title">
-                      <h5>Tất cả các công ty</h5>
+                      <h5>Tất cả các sản phẩm</h5>
                     </div>
                     <table className="table table-default all-events table-striped table-responsive-lg">
                       <thead>
                         <tr>
                           <th>ID#</th>
-                          <th>Tên công ty</th>
-                          <th>Mô Tả</th>
-                          <th>Quốc Gia</th>
+                          <th>Tên Sản Phẩm</th>
+                          <th>Thông Tin</th>
+                          <th>Tuổi bắt đầu</th>
+                          <th>Tuổi kết thúc</th>
+                          <th>Thương Hiệu Sữa</th>
+                          <th>Hình Anh</th>
                           <th>Edit</th>
                         </tr>
                       </thead>
@@ -766,13 +823,13 @@ export default function Group() {
               <div className="row merged20 mb-4">
                 <div className="col-lg-6">
                   <div className="d-widget">
-                   
-                   
+
+
                   </div>
                 </div>
-              
+
               </div>
-            
+
             </div>
           </div>
         </div>
@@ -1017,7 +1074,7 @@ export default function Group() {
                   }}
                   id="popup-head-name"
                 >
-                  Tạo công ty
+                  Tạo Sản Phẩm
                 </p>
               </h5>
             </div>
@@ -1040,18 +1097,18 @@ export default function Group() {
                     width: "20%",
                   }}
                 >
-                  Chọn quốc gia:{" "}
+                  Chọn thương hiệu:{" "}
                 </p>
                 <select
                   onChange={onChangeSelect}
-                  id="txtSelectCountry"
+                  id="txtMilkBrandId"
                   style={{
                     padding: 10,
                     width: "30%",
                     marginRight: 10,
                   }}
                 >
-                  <option>Chọn quốc gia</option>
+                  <option>Chọn thương hiệu</option>
                   {stateAdd == "Create"
                     ? renderAllSchool()
                     : renderAllSchool(schoolEdit)}
@@ -1071,11 +1128,11 @@ export default function Group() {
                     width: "20%",
                   }}
                 >
-                  Tên công ty:{" "}
+                  Tên sản phẩm:{" "}
                 </p>
                 <input
                   required
-                  placeholder="Tên của công ty"
+                  placeholder="Tên của sản phẩm"
                   style={{
                     width: "100%",
                     padding: 10,
@@ -1090,34 +1147,64 @@ export default function Group() {
                   alignItems: "baseline",
                 }}
               >
-              
+
               </div>
-              <div
-                style={{
-                  display: "flex",
-                  marginTop: 20,
-                  alignItems: "baseline",
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 700,
-                    width: "20%",
-                  }}
-                >
+              <div style={{ display: "flex", marginTop: 20, alignItems: "baseline" }}>
+                <p style={{ fontSize: 20, fontWeight: 700, width: "20%" }}>
                   Mô tả:{" "}
                 </p>
                 <input
                   required
-                  placeholder="Mô tả của nhóm"
-                  style={{
-                    width: "100%",
-                    padding: 10,
-                  }}
+                  placeholder="Mô tả của sản phẩm"
+                  style={{ width: "100%", padding: 10 }}
                   id="txtDesciption"
                 />
               </div>
+
+              <div style={{ display: "flex", marginTop: 20, alignItems: "baseline" }}>
+                <p style={{ fontSize: 20, fontWeight: 700, width: "20%" }}>
+                  Tuổi bắt đầu:{" "}
+                </p>
+                <input
+                  required
+                  placeholder="Tuổi bắt đầu"
+                  style={{ width: "100%", padding: 10 }}
+                  id="txtstartAge"
+                />
+              </div>
+
+              <div style={{ display: "flex", marginTop: 20, alignItems: "baseline" }}>
+                <p style={{ fontSize: 20, fontWeight: 700, width: "20%" }}>
+                  Tuổi kết thúc:{" "}
+                </p>
+                <input
+                  required
+                  placeholder="Tuổi kết thúc"
+                  style={{ width: "100%", padding: 10 }}
+                  id="txtendAge"
+                />
+              </div>
+
+              <div style={{ display: "flex", marginTop: 20, alignItems: "baseline" }}>
+                <p style={{ fontSize: 20, fontWeight: 700, width: "20%" }}>
+                  Hình ảnh:{" "}
+                </p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  required
+                  style={{ width: "100%", padding: 10 }}
+                  id="txtImage"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    // Xử lý tệp hình ảnh ở đây
+                  }}
+                />
+              </div>
+
+
+
+
               <button
                 className="main-btn"
                 style={{
@@ -1131,7 +1218,7 @@ export default function Group() {
                   marginRight: "auto",
                 }}
               >
-                { stateAdd == "Create" ? "Tạo Công Ty" : "Cập nhật" }
+                Tạo Sản Phẩm
               </button>
             </form>
           </div>
@@ -1157,7 +1244,7 @@ export default function Group() {
                   }}
                   id="popup-head-name"
                 >
-                  Bạn có chắn muốn xóa công ty này ?
+                  Bạn có chắn muốn xóa thương hiệu này ?
                 </p>
               </h5>
             </div>

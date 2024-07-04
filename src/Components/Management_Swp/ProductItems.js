@@ -1,115 +1,38 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import SideBar from "../../Sidebar/SideBar";
-import { Country } from "../../Country";
+import React, { useState, useEffect } from "react";
+import SideBar from "../Sidebar/SideBar";
 
-export default function Group() {
-  const [groups, setGroups] = useState([]);
-  const [schools, setSchools] = useState([]);
+export default function Schools() {
+  const [school, setSchools] = useState([]);
   const [stateAdd, setStateAdd] = useState("Create");
-  const [schoolEdit, setSchoolEdit] = useState(-1);
-  const [imgNotSave, setImgNotSave] = useState([]);
-  const [groupRecent, setGroupRecent] = useState({});
-  const [deleteGroupId, setDeleteGroupId] = useState(-1);
+  const [schoolRecent, setSchoolRecent] = useState([]);
+  const [imgNotSave, setImgNotSave] = useState({});
+  
 
   useEffect(async () => {
-    getAllSchool();
-    await getAllGroups();
+    await getAllSchool();
+    
   }, []);
-
-  const clickToUpdate = async (id) => {
-    await getGroupRecent(id);
-  };
   const changeSubmit = async (event) => {
     event.preventDefault();
     if (stateAdd == "Create") {
-      await addGroup();
+      await addNewSchool();
     } else {
-      await updateGroup();
+      await updateSchool();
     }
   };
-  const addGroup = async () => {
-    if (
-      document.getElementById("txtSelectCountry").value != "Chọn quốc gia"
-    ) {
-        try {
-          const data = {
-            Name: document.getElementById("txtName").value,
-            Description: document.getElementById("txtDesciption").value,
-            Nation: document.getElementById("txtSelectCountry").value
-          };
-          const formData = new FormData();
-          formData.append('Name', document.getElementById("txtName").value);  
-          formData.append('Description', document.getElementById("txtDesciption").value); 
-          formData.append('Nation', document.getElementById("txtSelectCountry").value); 
-          console.log(data)
-          const response = await axios.post(
-            "http://localhost:5106/api/Company/AddCompany",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data"
-              },
-            }
-          );
-          if (response.status === 200) {
-            await getAllGroups();
-            alert("Tạo company thành công");
-            setStateAdd("Create");
-            document.getElementById("txtName").value = "";
-            document.getElementById("txtDesciption").value = "";
-            var elementTest = document.getElementById("post-new");
-            elementTest.classList.remove("active");
-          }
-        } catch (err) {
-          console.error(err);
-        }
-    } else {
-      alert("Có lỗi rồi");
+  const upImgInState = async (e) => {
+    setImgNotSave(e.target.files[0]);
+    if (stateAdd == "Update") {
+      document.getElementById("txtUpdateCover").src = URL.createObjectURL(
+        e.target.files[0]
+      );
     }
   };
-  const updateGroup = async () => {
-    if (
-      document.getElementById("txtSelectCountry").value != "Chọn quốc gia"
-    ) {
-      try {
-        const formData = new FormData();
-          formData.append('Id', schoolEdit); 
-          formData.append('Name', document.getElementById("txtName").value);  
-          formData.append('Description', document.getElementById("txtDesciption").value); 
-          formData.append('Nation', document.getElementById("txtSelectCountry").value); 
-          console.log(schoolEdit)
-        const response = await axios.put(
-          `http://localhost:5106/api/Company/UpdateCompany`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data"
-            },
-          }
-        );
-        if (response.status === 200) {
-          await getAllGroups();
-          alert("Cập nhập công ty thành công ");
-          
-          setStateAdd("Create");
-          document.getElementById("txtName").value = "";
-          document.getElementById("txtDesciption").value = "";
-          document.getElementById("txtSelectCountry").value = "";
-          var elementTest = document.getElementById("post-new");
-          elementTest.classList.remove("active");
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    } else {
-      alert("Chọn quốc gia");
-    }
-  };
-  const getGroupRecent = async (id) => {
+  const getAllSchool = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5106/api/Company/GetById/getbyid?id=${id}`,
+        "https://truongxuaapp.online/api/v1/schools?pageNumber=1&pageSize=0",
         {
           headers: {
             "Content-Type": "application/json",
@@ -118,22 +41,20 @@ export default function Group() {
         }
       );
       if (response.status === 200) {
-        setGroupRecent(response.data);
-        document.getElementById("txtName").value = response.data.name;
-        document.getElementById("txtDesciption").value =
-          response.data.description;
-          document.getElementById("txtSelectCountry").value = response.data.nation;
-        setSchoolEdit(id);
-         getAllSchool();
+        //console.log(response.data);
+        setSchools(response.data);
       }
     } catch (err) {
       console.error(err);
     }
   };
-  const getSchoolIdBySchoolYearId = async (schoolYearId) => {
+  const clickToUpdate = async (id) => {
+    await getSchoolRecent(id);
+  };
+  const getSchoolRecent = async (idSchool) => {
     try {
       const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/schools/schoolyears/${schoolYearId}`,
+        `https://truongxuaapp.online/api/v1/schools/${idSchool}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -142,7 +63,16 @@ export default function Group() {
         }
       );
       if (response.status === 200) {
-        return response.data.schoolId;
+        setSchoolRecent(response.data);
+        document.getElementById("txtName").value = response.data.name;
+        document.getElementById("txtPhone").value = response.data.phone;
+        document.getElementById("txtDesciption").value =
+          response.data.description;
+        document.getElementById("txtWebsite").value = response.data.website;
+        document.getElementById("txtHeadmaster").value =
+          response.data.headmaster;
+        document.getElementById("txtAddress").value = response.data.address;
+        document.getElementById("txtUpdateCover").src = response.data.image;
       }
     } catch (err) {
       console.error(err);
@@ -159,7 +89,7 @@ export default function Group() {
         data: body,
       });
       if (response.status == 200) {
-        console.log(response.data.data.display_url);
+        //console.log(response.data.data.display_url);
         return response.data.data.display_url;
         // dataImgSave = {
         //   name: response.data.data.title,
@@ -171,57 +101,68 @@ export default function Group() {
       console.error(err);
     }
   };
-  const getAllSchool = () => {
-    setSchools(Country);
-  };
-  const renderAllSchool = (selectIndex) => {
-    return schools.map((element, index) => {
-      if (selectIndex == undefined) {
-        return (
-          <option value={element.id} key={index}>
-            {element.name}
-          </option>
-        );
-      } else {
-        if (selectIndex == element.id) {
-          return (
-            <option value={element.id} key={index} selected>
-              {element.name}
-            </option>
-          );
-        } else {
-          return (
-            <option value={element.id} key={index}>
-              {element.name}
-            </option>
-          );
-        }
-      }
-    });
-  };
-  const onChangeSelect = async (event) => {
-  };
-  const getAllGroups = async () => {
+  const addNewSchool = async () => {
+    let imgBB = await saveImgInImgBB(imgNotSave);
+    console.log(imgBB);
     try {
-      const response = await axios.get(
-        "http://localhost:5106/api/Company/GetAllCompany",
+      const data = {
+        name: document.getElementById("txtName").value,
+        description: document.getElementById("txtDesciption").value,
+        image: imgBB,
+        phone: document.getElementById("txtPhone").value,
+        address: document.getElementById("txtAddress").value,
+        website: document.getElementById("txtWebsite").value,
+        headmaster: document.getElementById("txtHeadmaster").value,
+      };
+      const response = await axios.post(
+        "https://truongxuaapp.online/api/v1/schools",
+        data,
         {
           headers: {
-            "Content-Type": "application/json"
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.authorization,
           },
         }
       );
       if (response.status === 200) {
-        setGroups(response.data.data);
+        document.getElementById("txtName").value = "";
+        document.getElementById("txtPhone").value = "";
+        document.getElementById("txtDesciption").value = "";
+        document.getElementById("txtWebsite").value = "";
+        document.getElementById("txtHeadmaster").value = "";
+        document.getElementById("txtAddress").value = "";
+        document.getElementById("txtAvaSchool").value = "";
+        setStateAdd("Create");
+        setImgNotSave([]);
+        await getAllSchool();
+        alert("Tạo trường thành công ");
+        var elementTest = document.getElementById("post-new");
+        elementTest.classList.remove("active");
       }
     } catch (err) {
       console.error(err);
     }
   };
-  const getImageByPostId = async (postId) => {
+  const updateSchool = async () => {
+    let imgBB = null;
+    imgBB = await saveImgInImgBB(imgNotSave);
+    if (imgBB == null) {
+      imgBB = schoolRecent.image;
+    }
     try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/images/postid?postId=${postId}`,
+      const data = {
+        name: document.getElementById("txtName").value,
+        description: document.getElementById("txtDesciption").value,
+        image: imgBB,
+        phone: document.getElementById("txtPhone").value,
+        address: document.getElementById("txtAddress").value,
+        website: document.getElementById("txtWebsite").value,
+        headmaster: document.getElementById("txtHeadmaster").value,
+      };
+      const response = await axios.put(
+        `https://truongxuaapp.online/api/v1/schools?id=${schoolRecent.id}`,
+        data,
         {
           headers: {
             "Content-Type": "application/json",
@@ -230,117 +171,54 @@ export default function Group() {
         }
       );
       if (response.status === 200) {
-        for (let i = 0; i < response.data.length; i++) {
-          await deleteImageInPost(response.data[i].id);
-        }
+        document.getElementById("txtName").value = "";
+        document.getElementById("txtPhone").value = "";
+        document.getElementById("txtDesciption").value = "";
+        document.getElementById("txtWebsite").value = "";
+        document.getElementById("txtHeadmaster").value = "";
+        document.getElementById("txtAddress").value = "";
+        document.getElementById("txtAvaSchool").value = "";
+        setStateAdd("Create");
+        setImgNotSave([]);
+        await getAllSchool();
+
+        alert("Cập nhật trường thành công");
+        var elementTest = document.getElementById("post-new");
+        elementTest.classList.remove("active");
       }
     } catch (err) {
       console.error(err);
     }
   };
-  const deleteImageInPost = async (idImage) => {
-    try {
-      const response = await axios.delete(
-        `https://truongxuaapp.online/api/v1/images/${idImage}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const getCommentByPostId = async (postId) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/posts/comments/postid?postId=${postId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        for (let i = 0; i < response.data.length; i++) {
-          await deleteCommentInPost(response.data[i].id);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const deleteCommentInPost = async (idComment) => {
-    try {
-      const response = await axios.delete(
-        `https://truongxuaapp.online/api/v1/posts/comments/${idComment}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const findPostByGroupId = async (groupId) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/posts/groupid?groupId=${groupId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        for (let i = 0; i < response.data.length; i++) {
-          getImageByPostId(response.data[i].id);
-          getCommentByPostId(response.data[i].id);
-        }
-      }
-    } catch (err) {
-      console.err(err);
-    }
-  };
-  const deleteAGroup = async (idGroup) => {
-    try {
-      const response = await axios.delete(
-        `http://localhost:5106/api/Company/DeleteCompany?id=${idGroup}`
-      );
-      if (response.status === 200) {
-        document.getElementById("delete-post").classList.remove("active");
-        alert("Xóa thành công nhóm");
-        await getAllGroups();
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  const renderAllGroups = () => {
-    return groups.map((element, index) => {
+  const renderSchools = () => {
+    return school.map((element, index) => {
       return (
         <tr key={index}>
           <td>{element.id}</td>
           <td>{element.name}</td>
-          <td className="text-success">{element.description}</td>
-          <td>{element.nation}</td>
-
+          <td>{element.description}</td>
+          <td>{element.phone}</td>
+          <td>{element.address}</td>
+          <td>
+            <a href="#" title>
+              {element.website}
+            </a>
+          </td>
+          <td> {element.headmaster}</td>
+          <td>
+            <img
+              style={{
+                width: 150,
+                height: 100,
+              }}
+              src={element.image}
+              alt=""
+            />
+          </td>
           <td>
             <div
-              onClick={() => {
-                var elementTest = document.getElementById("delete-post");
-                elementTest.classList.add("active");
-                setDeleteGroupId(element.id);
-              }}
               style={{
-                marginBottom: 10,
+                marginBottom: 16,
               }}
               className="button soft-danger"
             >
@@ -348,11 +226,10 @@ export default function Group() {
             </div>
             <div
               onClick={() => {
+                clickToUpdate(element.id);
+                setStateAdd("Update");
                 var elementTest = document.getElementById("post-new");
                 elementTest.classList.add("active");
-                setStateAdd("Update");
-                setSchools([]);
-                clickToUpdate(element.id);
               }}
               className="button soft-primary"
             >
@@ -696,7 +573,7 @@ export default function Group() {
                 </i>
               </div>
               <div className="page-title">
-                <h4>All Events</h4>
+                <h4>Trường</h4>
               </div>
             </div>
             <div className="col-lg-6 col-md-6 col-sm-6">
@@ -719,11 +596,132 @@ export default function Group() {
       {/* top sub bar */}
       <SideBar />
       {/* sidebar */}
-      <div className="container-fluid">
+       <div className="container-fluid">
         <div className="row">
           <div className="col-lg-12">
             <div className="panel-content">
-              <h4 className="main-title">Quản lý công ty</h4>
+              <h4 className="main-title">Quản lý Sữa</h4>
+              <div className="row merged20 mb-4">
+                <div className="col-lg-3 col-md-6">
+                  <div className="d-widget">
+                    <div className="event-stat">
+                      <i>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={20}
+                          height={20}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="feather feather-calendar"
+                        >
+                          <rect
+                            x={3}
+                            y={4}
+                            width={18}
+                            height={18}
+                            rx={2}
+                            ry={2}
+                          />
+                          <line x1={16} y1={2} x2={16} y2={6} />
+                          <line x1={8} y1={2} x2={8} y2={6} />
+                          <line x1={3} y1={10} x2={21} y2={10} />
+                        </svg>
+                      </i>
+                      <div className="event-figure">
+                        <h5>{school.length}</h5>
+                        <span>Kho sữa</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-3 col-md-6 ">
+                  <div className="d-widget">
+                    <div className="event-stat">
+                      <i>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={14}
+                          height={14}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="feather feather-users"
+                        >
+                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                          <circle cx={9} cy={7} r={4} />
+                          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                      </i>
+                      <div className="event-figure">
+                        <h5>10</h5>
+                        <span>Hết Hàng</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-3 col-md-6">
+                  <div className="d-widget">
+                    <div className="event-stat">
+                      <i>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={24}
+                          height={24}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="feather feather-file"
+                        >
+                          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+                          <polyline points="13 2 13 9 20 9" />
+                        </svg>
+                      </i>
+                      <div className="event-figure">
+                        <h5>41</h5>
+                        <span>Số Công Ty</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-3 col-md-6">
+                  <div className="d-widget">
+                    <div className="event-stat">
+                      <i>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={20}
+                          height={20}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="feather feather-dollar-sign"
+                        >
+                          <line x1={12} y1={1} x2={12} y2={23} />
+                          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                      </i>
+                      <div className="event-figure">
+                        <h5>400</h5>
+                        <span>Số Thương Hiệu</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <button
                 className="main-btn"
                 onClick={() => {
@@ -740,25 +738,29 @@ export default function Group() {
                   marginBottom: 26,
                 }}
               >
-                Tạo Công ty
+                Tạo trường
               </button>
               <div className="row merged20 mb-4">
                 <div className="col-lg-12">
                   <div className="d-widget">
                     <div className="d-widget-title">
-                      <h5>Tất cả các công ty</h5>
+                      <h5>Tất cả các trường</h5>
                     </div>
                     <table className="table table-default all-events table-striped table-responsive-lg">
                       <thead>
                         <tr>
                           <th>ID#</th>
-                          <th>Tên công ty</th>
-                          <th>Mô Tả</th>
-                          <th>Quốc Gia</th>
+                          <th>Name</th>
+                          <th>Description</th>
+                          <th>Phone</th>
+                          <th>Address</th>
+                          <th>Website</th>
+                          <th>Headmaster</th>
+                          <th>Image</th>
                           <th>Edit</th>
                         </tr>
                       </thead>
-                      <tbody>{renderAllGroups()}</tbody>
+                      <tbody>{renderSchools()}</tbody>
                     </table>
                   </div>
                 </div>
@@ -766,13 +768,204 @@ export default function Group() {
               <div className="row merged20 mb-4">
                 <div className="col-lg-6">
                   <div className="d-widget">
-                   
-                   
+                    <div className="d-widget-title">
+                      <h5>Events Schedule</h5>
+                    </div>
+                    <ul className="upcoming-event">
+                      <li>
+                        <div className="event-date soft-red">
+                          <i>24 FEB</i>
+                          <span>2021</span>
+                        </div>
+                        <div className="event-deta">
+                          <h5>digital marketing summit</h5>
+                          <ul>
+                            <li>
+                              <i className="icofont-user" /> steve Josef
+                            </li>
+                            <li>
+                              <i className="icofont-map-pins" /> New York City
+                            </li>
+                            <li>
+                              <i className="icofont-clock-time" /> 9:00PM-12AM
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                      <li>
+                        <div className="event-date soft-green">
+                          <i>10 MAR</i>
+                          <span>2021</span>
+                        </div>
+                        <div className="event-deta">
+                          <h5>digital marketing summit</h5>
+                          <ul>
+                            <li>
+                              <i className="icofont-user" /> steve Josef
+                            </li>
+                            <li>
+                              <i className="icofont-map-pins" /> New York City
+                            </li>
+                            <li>
+                              <i className="icofont-clock-time" /> 9:00PM-12AM
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                      <li>
+                        <div className="event-date soft-blue">
+                          <i>20 OCT</i>
+                          <span>2021</span>
+                        </div>
+                        <div className="event-deta">
+                          <h5>digital marketing summit</h5>
+                          <ul>
+                            <li>
+                              <i className="icofont-user" /> steve Josef
+                            </li>
+                            <li>
+                              <i className="icofont-map-pins" /> New York City
+                            </li>
+                            <li>
+                              <i className="icofont-clock-time" /> 9:00PM-12AM
+                            </li>
+                          </ul>
+                        </div>
+                      </li>
+                    </ul>
                   </div>
                 </div>
-              
+                <div className="col-lg-6">
+                  <div className="d-widget">
+                    <div className="d-widget-title">
+                      <h5>Web Traffic</h5>
+                      <select className="browser-default custom-select">
+                        <option value={3}>last day</option>
+                        <option value={2}>week</option>
+                        <option selected>Monthly</option>
+                        <option value={1}>Yearly</option>
+                      </select>
+                    </div>
+                    <div className="web-traffic">
+                      <div className="chart-legend">
+                        <p>Today's visitors</p>
+                        <h5>98,300</h5>
+                      </div>
+                      <div id="hybrid_traffic" />
+                    </div>
+                  </div>
+                </div>
               </div>
-            
+              <div className="row merged20 mb-4">
+                <div className="col-lg-6">
+                  <div className="d-widget">
+                    <div className="d-widget-title">
+                      <h5>Notice Borad</h5>
+                    </div>
+                    <div className="d-Notices">
+                      <ul>
+                        <li>
+                          <p>March 21, 2021</p>
+                          <h6>
+                            <a href="#" title>
+                              Mr. William
+                            </a>{" "}
+                            <span>5 mint ago</span>
+                          </h6>
+                          <p>
+                            invited to join the meeting in the conference room
+                            at 9.45 am
+                          </p>
+                          <div
+                            style={{
+                              marginBottom: 16,
+                            }}
+                            className="action-btns"
+                          >
+                            <div className="button soft-danger" title="ignore">
+                              <i className="icofont-trash" />
+                            </div>
+                            <div className="button soft-primary" title="save">
+                              <i className="icofont-star" />
+                            </div>
+                          </div>
+                        </li>
+                        <li>
+                          <p>Feb 15, 2021</p>
+                          <h6>
+                            <a href="#" title>
+                              Andrew{" "}
+                            </a>{" "}
+                            <span>35 mint ago</span>
+                          </h6>
+                          <p>
+                            created a group 'Hencework' in the discussion forum
+                          </p>
+                          <div className="action-btns">
+                            <div className="button soft-danger" title="ignore">
+                              <i className="icofont-trash" />
+                            </div>
+                            <div className="button soft-primary" title="save">
+                              <i className="icofont-star" />
+                            </div>
+                          </div>
+                        </li>
+                        <li>
+                          <p>Jan 10, 2021</p>
+                          <h6>
+                            <a href="#" title>
+                              Franklyn J.
+                            </a>{" "}
+                            <span>40 mint ago</span>
+                          </h6>
+                          <p>Prepare the conference schedule</p>
+                          <div className="action-btns">
+                            <div className="button soft-danger" title="ignore">
+                              <i className="icofont-trash" />
+                            </div>
+                            <div className="button soft-primary" title="save">
+                              <i className="icofont-star" />
+                            </div>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-6">
+                  <div className="d-widget">
+                    <div className="d-widget-title">
+                      <h5>Logs</h5>
+                    </div>
+                    <ul className="recent-log">
+                      <li className="hole-circle red-circle">
+                        <span>New User Registration</span> <i>23:13</i>
+                      </li>
+                      <li className="hole-circle blue-circle">
+                        <span>New 14 products added.</span> <i>22:10</i>
+                      </li>
+                      <li className="hole-circle green-circle">
+                        <span>New sale: Napole.</span> <i>21:33</i>
+                      </li>
+                      <li className="hole-circle yellow-circle">
+                        <span>New notifications</span> <i>20:40</i>
+                      </li>
+                      <li className="hole-circle orange-circle">
+                        <span>New Comments</span> <i>19:20</i>
+                      </li>
+                      <li className="hole-circle blue-circle">
+                        <span>New sale: souffle.</span> <i>18:00</i>
+                      </li>
+                      <li className="hole-circle yellow-circle">
+                        <span>New notifications</span> <i>20:40</i>
+                      </li>
+                      <li className="hole-circle red-circle">
+                        <span>New User Registration</span> <i>23:13</i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -979,7 +1172,12 @@ export default function Group() {
               element.classList.remove("active");
               setStateAdd("Create");
               document.getElementById("txtName").value = "";
+              document.getElementById("txtPhone").value = "";
               document.getElementById("txtDesciption").value = "";
+              document.getElementById("txtWebsite").value = "";
+              document.getElementById("txtHeadmaster").value = "";
+              document.getElementById("txtAddress").value = "";
+              document.getElementById("txtAvaSchool").value = "";
               //setElementUpdate(undefined);
             }}
             className="popup-closed"
@@ -1017,7 +1215,7 @@ export default function Group() {
                   }}
                   id="popup-head-name"
                 >
-                  Tạo công ty
+                  Tạo trường
                 </p>
               </h5>
             </div>
@@ -1040,22 +1238,17 @@ export default function Group() {
                     width: "20%",
                   }}
                 >
-                  Chọn quốc gia:{" "}
+                  Tên trường:{" "}
                 </p>
-                <select
-                  onChange={onChangeSelect}
-                  id="txtSelectCountry"
+                <input
+                  required
+                  placeholder="Tên trường"
                   style={{
+                    width: "100%",
                     padding: 10,
-                    width: "30%",
-                    marginRight: 10,
                   }}
-                >
-                  <option>Chọn quốc gia</option>
-                  {stateAdd == "Create"
-                    ? renderAllSchool()
-                    : renderAllSchool(schoolEdit)}
-                </select>
+                  id="txtName"
+                />
               </div>
               <div
                 style={{
@@ -1071,26 +1264,18 @@ export default function Group() {
                     width: "20%",
                   }}
                 >
-                  Tên công ty:{" "}
+                  SĐT:{" "}
                 </p>
                 <input
                   required
-                  placeholder="Tên của công ty"
+                  placeholder="
+                  Số điện thoại của trường"
                   style={{
                     width: "100%",
                     padding: 10,
                   }}
-                  id="txtName"
+                  id="txtPhone"
                 />
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  marginTop: 20,
-                  alignItems: "baseline",
-                }}
-              >
-              
               </div>
               <div
                 style={{
@@ -1110,12 +1295,150 @@ export default function Group() {
                 </p>
                 <input
                   required
-                  placeholder="Mô tả của nhóm"
+                  placeholder="Mô tả của trường"
                   style={{
                     width: "100%",
                     padding: 10,
                   }}
                   id="txtDesciption"
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: 20,
+                  alignItems: "baseline",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    width: "20%",
+                  }}
+                >
+                  Website:{" "}
+                </p>
+                <input
+                  required
+                  placeholder="Website của trường"
+                  style={{
+                    width: "100%",
+                    padding: 10,
+                  }}
+                  id="txtWebsite"
+                />
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: 20,
+                  alignItems: "baseline",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    width: "20%",
+                  }}
+                >
+                  Hiệu trưởng:{" "}
+                </p>
+                <input
+                  required
+                  placeholder="Hiệu trưởng của trường"
+                  style={{
+                    width: "100%",
+                    padding: 10,
+                  }}
+                  id="txtHeadmaster"
+                />
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: 20,
+                  alignItems: "baseline",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    width: "20%",
+                  }}
+                >
+                  Địa chỉ:{" "}
+                </p>
+                <input
+                  required
+                  placeholder="Địa chỉ của trường"
+                  style={{
+                    width: "100%",
+                    padding: 10,
+                  }}
+                  id="txtAddress"
+                />
+              </div>
+
+              <div
+                //onChange={saveImgCover}
+                style={{
+                  display: "flex",
+                  marginTop: 20,
+                  alignItems: "baseline",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    width: "20%",
+                  }}
+                >
+                  Ảnh trường:{" "}
+                </p>
+                {stateAdd == "Update" ? (
+                  <div
+                    style={{
+                      position: "relative",
+                    }}
+                  >
+                    <img
+                      style={{
+                        width: 120,
+                        height: 60,
+                        marginRight: 16,
+                      }}
+                      id="txtUpdateCover"
+                      src=""
+                    />
+                    <i
+                      style={{
+                        fontSize: 20,
+                        position: "absolute",
+                        right: 18,
+                        top: 3,
+                        color: "white",
+                      }}
+                      class="icofont-close-circled"
+                    ></i>
+                  </div>
+                ) : (
+                  ""
+                )}
+                <input
+                  onChange={upImgInState}
+                  style={{
+                    width: stateAdd == "Create" ? "100%" : "60%",
+                    padding: 10,
+                  }}
+                  id="txtAvaSchool"
+                  type="file"
+                  accept="image/x-png,image/gif,image/jpeg"
                 />
               </div>
               <button
@@ -1131,74 +1454,9 @@ export default function Group() {
                   marginRight: "auto",
                 }}
               >
-                { stateAdd == "Create" ? "Tạo Công Ty" : "Cập nhật" }
+                Tạo nhóm
               </button>
             </form>
-          </div>
-        </div>
-      </div>
-      <div id="delete-post" className="post-new-popup">
-        <div className="popup" style={{ width: "800px" }}>
-          <span
-            onClick={() => {
-              var element = document.getElementById("delete-post");
-              element.classList.remove("active");
-            }}
-            className="popup-closed"
-          >
-            <i className="icofont-close" />
-          </span>
-          <div className="popup-meta">
-            <div className="popup-head">
-              <h5>
-                <p
-                  style={{
-                    fontSize: 18,
-                  }}
-                  id="popup-head-name"
-                >
-                  Bạn có chắn muốn xóa công ty này ?
-                </p>
-              </h5>
-            </div>
-            <div className="post-new">
-              <button
-                style={{
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  paddingRight: 20,
-                  paddingLeft: 20,
-
-                  borderWidth: 1,
-                  borderStyle: "solid",
-                  borderColor: "#EFEFEF",
-                  float: "right",
-                  marginLeft: 10,
-                }}
-                onClick={() => {
-                  var element = document.getElementById("delete-post");
-                  element.classList.remove("active");
-                }}
-              >
-                Hủy
-              </button>
-              <button
-                style={{
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  paddingRight: 20,
-                  paddingLeft: 20,
-                  borderWidth: 1,
-                  borderStyle: "solid",
-                  borderColor: "red",
-                  backgroundColor: "red",
-                  float: "right",
-                }}
-                onClick={() => deleteAGroup(deleteGroupId)}
-              >
-                Xóa
-              </button>
-            </div>
           </div>
         </div>
       </div>
