@@ -3,12 +3,12 @@ import React, { useEffect, useState } from "react";
 import SideBar from "../../Sidebar/SideBar";
 import { Country } from "../../Country";
 
-export default function Group() {
+export default function Nutrient() {
   const [groups, setGroups] = useState([]);
   const [schools, setSchools] = useState([]);
   const [stateAdd, setStateAdd] = useState("Create");
   const [schoolEdit, setSchoolEdit] = useState(-1);
-  const [imgNotSave, setImgNotSave] = useState([]);
+
   const [groupRecent, setGroupRecent] = useState({});
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
 
@@ -29,22 +29,19 @@ export default function Group() {
     }
   };
   const addGroup = async () => {
-    if (
-      document.getElementById("txtSelectCountry").value != "Chọn quốc gia"
-    ) {
+    
+    
         try {
           const data = {
-            Name: document.getElementById("txtName").value,
-            Description: document.getElementById("txtDesciption").value,
-            Nation: document.getElementById("txtSelectCountry").value
+            milfuncion: document.getElementById("txtnutrient").value,
+           
           };
           const formData = new FormData();
-          formData.append('Name', document.getElementById("txtName").value);  
-          formData.append('Description', document.getElementById("txtDesciption").value); 
-          formData.append('Nation', document.getElementById("txtSelectCountry").value); 
+          formData.append('Name', document.getElementById("txtnutrient").value);  
+           
           console.log(data)
           const response = await axios.post(
-            "http://localhost:5106/api/Company/AddCompany",
+            "http://localhost:5106/api/Nutrient/AddNutrient",
             formData,
             {
               headers: {
@@ -54,33 +51,29 @@ export default function Group() {
           );
           if (response.status === 200) {
             await getAllGroups();
-            alert("Tạo company thành công");
+            alert("Tạo chất dinh dưỡng thành công");
             setStateAdd("Create");
-            document.getElementById("txtName").value = "";
-            document.getElementById("txtDesciption").value = "";
+            document.getElementById("txtnutrient").value = "";
+            
             var elementTest = document.getElementById("post-new");
             elementTest.classList.remove("active");
           }
         } catch (err) {
           console.error(err);
         }
-    } else {
-      alert("Có lỗi rồi");
-    }
+     
   };
   const updateGroup = async () => {
-    if (
-      document.getElementById("txtSelectCountry").value != "Chọn quốc gia"
-    ) {
+   
+      
       try {
+        
         const formData = new FormData();
-          formData.append('Id', schoolEdit); 
-          formData.append('Name', document.getElementById("txtName").value);  
-          formData.append('Description', document.getElementById("txtDesciption").value); 
-          formData.append('Nation', document.getElementById("txtSelectCountry").value); 
-          console.log(schoolEdit)
+        formData.append('Id', schoolEdit); 
+        formData.append('Name', document.getElementById("txtmilkfuncion").value); 
+        console.log(schoolEdit)
         const response = await axios.put(
-          `http://localhost:5106/api/Company/UpdateCompany`,
+          `http://localhost:5106/api/MilkFunction/UpdateMilkFunction`,
           formData,
           {
             headers: {
@@ -90,121 +83,50 @@ export default function Group() {
         );
         if (response.status === 200) {
           await getAllGroups();
-          alert("Cập nhập công ty thành công ");
+          alert("Cập nhập chất dinh dưỡng thành công ");
           
           setStateAdd("Create");
-          document.getElementById("txtName").value = "";
-          document.getElementById("txtDesciption").value = "";
-          document.getElementById("txtSelectCountry").value = "";
+          document.getElementById("txtmilkfuncion").value = "";
+         
           var elementTest = document.getElementById("post-new");
           elementTest.classList.remove("active");
         }
       } catch (err) {
         console.error(err);
       }
-    } else {
-      alert("Chọn quốc gia");
-    }
+   
   };
   const getGroupRecent = async (id) => {
     try {
       const response = await axios.get(
-        `http://localhost:5106/api/Company/GetById/getbyid?id=${id}`,
+        `http://localhost:5106/api/MilkFunction/GetById?id=${id}`,
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
+            
           },
         }
       );
       if (response.status === 200) {
         setGroupRecent(response.data);
-        document.getElementById("txtName").value = response.data.name;
-        document.getElementById("txtDesciption").value =
-          response.data.description;
-          document.getElementById("txtSelectCountry").value = response.data.nation;
+        document.getElementById("txtmilkfuncion").value = response.data.name;
+        
         setSchoolEdit(id);
-         getAllSchool();
+        getAllSchool();
       }
     } catch (err) {
       console.error(err);
     }
   };
-  const getSchoolIdBySchoolYearId = async (schoolYearId) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/schools/schoolyears/${schoolYearId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        return response.data.schoolId;
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const saveImgInImgBB = async (img) => {
-    let body = new FormData();
-    body.set("key", "71b6c3846105c92074f8e9a49b85887f");
-    body.append("image", img);
-    try {
-      const response = await axios({
-        method: "POST",
-        url: "https://api.imgbb.com/1/upload",
-        data: body,
-      });
-      if (response.status == 200) {
-        console.log(response.data.data.display_url);
-        return response.data.data.display_url;
-        // dataImgSave = {
-        //   name: response.data.data.title,
-        //   url_display: response.data.data.display_url,
-        // };
-        // return dataImgSave.url_display;
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+
   const getAllSchool = () => {
     setSchools(Country);
   };
-  const renderAllSchool = (selectIndex) => {
-    return schools.map((element, index) => {
-      if (selectIndex == undefined) {
-        return (
-          <option value={element.id} key={index}>
-            {element.name}
-          </option>
-        );
-      } else {
-        if (selectIndex == element.id) {
-          return (
-            <option value={element.id} key={index} selected>
-              {element.name}
-            </option>
-          );
-        } else {
-          return (
-            <option value={element.id} key={index}>
-              {element.name}
-            </option>
-          );
-        }
-      }
-    });
-  };
-  const onChangeSelect = async (event) => {
-  };
+ 
   const getAllGroups = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5106/api/Company/GetAllCompany",
+        "http://localhost:5106/api/Nutrient/GetNutrients",
         {
           headers: {
             "Content-Type": "application/json"
@@ -218,105 +140,17 @@ export default function Group() {
       console.error(err);
     }
   };
-  const getImageByPostId = async (postId) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/images/postid?postId=${postId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        for (let i = 0; i < response.data.length; i++) {
-          await deleteImageInPost(response.data[i].id);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const deleteImageInPost = async (idImage) => {
-    try {
-      const response = await axios.delete(
-        `https://truongxuaapp.online/api/v1/images/${idImage}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const getCommentByPostId = async (postId) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/posts/comments/postid?postId=${postId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        for (let i = 0; i < response.data.length; i++) {
-          await deleteCommentInPost(response.data[i].id);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const deleteCommentInPost = async (idComment) => {
-    try {
-      const response = await axios.delete(
-        `https://truongxuaapp.online/api/v1/posts/comments/${idComment}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const findPostByGroupId = async (groupId) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/posts/groupid?groupId=${groupId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        for (let i = 0; i < response.data.length; i++) {
-          getImageByPostId(response.data[i].id);
-          getCommentByPostId(response.data[i].id);
-        }
-      }
-    } catch (err) {
-      console.err(err);
-    }
-  };
+
+ 
+
   const deleteAGroup = async (idGroup) => {
     try {
       const response = await axios.delete(
-        `http://localhost:5106/api/Company/DeleteCompany?id=${idGroup}`
+        `http://localhost:5106/api/MilkFunction/DeletetMilkFunction?id=${idGroup}`
       );
       if (response.status === 200) {
         document.getElementById("delete-post").classList.remove("active");
-        alert("Xóa thành công nhóm");
+        alert("Xóa thành công ty");
         await getAllGroups();
       }
     } catch (err) {
@@ -330,8 +164,6 @@ export default function Group() {
           <td>{element.id}</td>
           <td>{element.name}</td>
           <td className="text-success">{element.description}</td>
-          <td>{element.nation}</td>
-
           <td>
             <div
               onClick={() => {
@@ -723,7 +555,7 @@ export default function Group() {
         <div className="row">
           <div className="col-lg-12">
             <div className="panel-content">
-              <h4 className="main-title">Quản lý công ty</h4>
+              <h4 className="main-title">Quản Lý dinh dưỡng</h4>
               <button
                 className="main-btn"
                 onClick={() => {
@@ -740,21 +572,20 @@ export default function Group() {
                   marginBottom: 26,
                 }}
               >
-                Tạo Công ty
+                Tạo chất dinh dưỡng
               </button>
               <div className="row merged20 mb-4">
                 <div className="col-lg-12">
                   <div className="d-widget">
                     <div className="d-widget-title">
-                      <h5>Tất cả các công ty</h5>
+                      <h5>Tất cả các chất dinh dưỡng</h5>
                     </div>
                     <table className="table table-default all-events table-striped table-responsive-lg">
                       <thead>
                         <tr>
                           <th>ID#</th>
-                          <th>Tên công ty</th>
-                          <th>Mô Tả</th>
-                          <th>Quốc Gia</th>
+                          <th>Chất dinh dưỡng</th>
+                          <th></th>
                           <th>Edit</th>
                         </tr>
                       </thead>
@@ -978,8 +809,8 @@ export default function Group() {
               var element = document.getElementById("post-new");
               element.classList.remove("active");
               setStateAdd("Create");
-              document.getElementById("txtName").value = "";
-              document.getElementById("txtDesciption").value = "";
+              document.getElementById("txtmilkfuncion").value = "";
+              
               //setElementUpdate(undefined);
             }}
             className="popup-closed"
@@ -1017,7 +848,7 @@ export default function Group() {
                   }}
                   id="popup-head-name"
                 >
-                  Tạo công ty
+                  Tạo chất dinh dưỡng
                 </p>
               </h5>
             </div>
@@ -1026,6 +857,7 @@ export default function Group() {
               style={{ width: "100%" }}
               className="c-form"
             >
+             
               <div
                 style={{
                   display: "flex",
@@ -1040,84 +872,20 @@ export default function Group() {
                     width: "20%",
                   }}
                 >
-                  Chọn quốc gia:{" "}
-                </p>
-                <select
-                  onChange={onChangeSelect}
-                  id="txtSelectCountry"
-                  style={{
-                    padding: 10,
-                    width: "30%",
-                    marginRight: 10,
-                  }}
-                >
-                  <option>Chọn quốc gia</option>
-                  {stateAdd == "Create"
-                    ? renderAllSchool()
-                    : renderAllSchool(schoolEdit)}
-                </select>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  marginTop: 20,
-                  alignItems: "baseline",
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 700,
-                    width: "20%",
-                  }}
-                >
-                  Tên công ty:{" "}
+                  Dinh dưỡng:{" "}
                 </p>
                 <input
                   required
-                  placeholder="Tên của công ty"
+                  placeholder="Nhập chất dinh dưỡng"
                   style={{
                     width: "100%",
                     padding: 10,
                   }}
-                  id="txtName"
+                  id="txtnutrient"
                 />
               </div>
-              <div
-                style={{
-                  display: "flex",
-                  marginTop: 20,
-                  alignItems: "baseline",
-                }}
-              >
-              
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  marginTop: 20,
-                  alignItems: "baseline",
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 700,
-                    width: "20%",
-                  }}
-                >
-                  Mô tả:{" "}
-                </p>
-                <input
-                  required
-                  placeholder="Mô tả của nhóm"
-                  style={{
-                    width: "100%",
-                    padding: 10,
-                  }}
-                  id="txtDesciption"
-                />
-              </div>
+            
+          
               <button
                 className="main-btn"
                 style={{
@@ -1131,7 +899,8 @@ export default function Group() {
                   marginRight: "auto",
                 }}
               >
-                { stateAdd == "Create" ? "Tạo Công Ty" : "Cập nhật" }
+                
+                { stateAdd == "Create" ? "Tạo chất dinh duõng" : "Cập nhật" }
               </button>
             </form>
           </div>

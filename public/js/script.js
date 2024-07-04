@@ -141,9 +141,7 @@ $(".menu-area").click(function () {
     }	
 
 //chosen select plugin
-	if ($.isFunction($.fn.chosen)) {
-		$("select").chosen();
-	}
+
 		
 //===== owl carousel  =====//
 	if ($.isFunction($.fn.owlCarousel)) {
