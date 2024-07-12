@@ -1,0 +1,42 @@
+/* SalesReport.css */
+.report-container {
+	text-align: center;
+	padding: 20px;
+  }
+  
+  .date-picker {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 20px;
+  }
+  
+  .date-picker button {
+	margin-left: 10px;
+  }
+  
+  .summary {
+	margin-top: 20px;
+  }
+  
+  .chart {
+	margin-top: 20px;
+  }
+  
+  h2 {
+	margin-bottom: 20px;
+  }
+  
+  h3 {
+	margin-top: 20px;
+  }
+  
+  ul {
+	list-style-type: none;
+	padding: 0;
+  }
+  
+  ul li {
+	margin: 10px 0;
+  }
+  

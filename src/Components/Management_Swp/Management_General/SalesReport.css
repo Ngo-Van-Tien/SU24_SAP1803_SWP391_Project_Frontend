@@ -1,0 +1,19 @@
+/* SalesReport.css */
+
+.report-container {
+    padding: 20px;
+    background-color: #f5f5f5;
+  }
+  
+  .date-picker {
+    margin-bottom: 20px;
+  }
+  
+  .summary {
+    margin-bottom: 20px;
+  }
+  
+  .chart {
+    margin-top: 20px;
+  }
+  
