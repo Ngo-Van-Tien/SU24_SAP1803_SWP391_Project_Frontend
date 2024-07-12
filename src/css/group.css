@@ -1,0 +1,37 @@
+
+
+.join {
+  padding: 5px 10px;
+  color: white;
+  background: #088dcd none repeat scroll 0 0;
+  width: max-content;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 13px;
+  margin: 20px;
+  float: right;
+}
+
+.select-group{
+	margin-bottom:20px;
+	border: none;
+	background-color:#71cff9;
+	padding:10px 20px;
+	border-radius:5px;
+	color:#291b1b;
+	font-weight: bold;
+	width: 250px;
+}
+
+.selected-group{
+	padding: 5px 10px;
+	background-color: aliceblue;
+}
+
+.icofont-refresh{
+  margin-left: 20px;
+  font-size: 20px;
+  font-weight: bold;
+color: #71cff9;
+  cursor: pointer;
+}
