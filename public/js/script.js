@@ -14,13 +14,6 @@ $(window).on('load', function () {
 			duration: 80
 		}, 'body' );
 
-	$('svg.feather' ).each(function() {
-		var iconID = $(this).attr('id');
-		if(iconID != undefined){
-			var iconVar = iconID.replace( '-', '' );
-			window['tc'+iconVar] = new Vivus( iconID, settings );
-		}
-	});
 	//svg mouse hover animation  
 	$(document).delegate( "ai-icon", "mouseenter", function() {
 		var iconID = $(this).find('svg').attr('id');

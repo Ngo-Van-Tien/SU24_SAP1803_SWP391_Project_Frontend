@@ -12,6 +12,10 @@ import MilkFuncion from "./Components/Management_Swp/Management_MilkFuncion/Milk
 import Nutrient from "./Components/Management_Swp/Management_Nutrient/Nutrient";
 import Order from "./Components/Management_Swp/Management_Order/Order";
 import OrderDetail from "./Components/Management_Swp/Management_Order/OrderDetail";
+import ProductNutrient from "./Components/Management_Swp/Management_Products/ProductNutrient";
+import General from "./Components/Management_Swp/Management_General/General";
+
+
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
@@ -46,7 +50,10 @@ function App() {
         <Route path="/nutrient" component={Nutrient} />
         <Route path="/order" component={Order} />
         <Route path="/orderDetail" component={OrderDetail} />
+        <Route path="/productNutrient" component={ProductNutrient} />
+        <Route path="/general" component={General} />
         
+      
         
       </div>
     </Router>
