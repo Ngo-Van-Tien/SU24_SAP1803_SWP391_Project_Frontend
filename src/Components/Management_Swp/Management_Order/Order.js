@@ -9,12 +9,19 @@ export default function Order() {
   const [schools, setSchools] = useState([]);
   const [stateAdd, setStateAdd] = useState("Create");
   const [schoolEdit, setSchoolEdit] = useState(-1);
-  const [imgNotSave, setImgNotSave] = useState([]);
   const [groupRecent, setGroupRecent] = useState({});
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
   const history = useHistory()
+  const statusTranslations = {
+    PROCESSING: "Đang xử lý",
+    DELIVERING: "Đang giao hàng",
+    DELIVERED: "Đã giao hàng",
+    CANCEL : "Đã hủy",
+    PAID: "Đã thanh toán",
+    UNPAID: "Chưa thanh toán",
+    REFUNDED: "Đã hoàn tiền"
+  };
   useEffect(async () => {
-    await getAllSchool();
     await getAllOrder();
   }, []);
 
@@ -37,7 +44,6 @@ export default function Order() {
         const ids = selectedOptionsList.map(option => option.id);
         const formData = new FormData();
         formData.append('Name', document.getElementById("txtName").value);
-        formData.append('Description', document.getElementById("txtDesciption").value);
         formData.append('CompanyId', document.getElementById("txtSelectCountry").value);
         selectedOptionsList.forEach((item, index) => {
           formData.append('MilkFunctionIds', item.id);
@@ -58,13 +64,8 @@ export default function Order() {
           await getAllOrder();
           alert("Tạo thương hiệu thành công");
           setStateAdd("Create");
-          document.getElementById("txtName").value = "";
-          document.getElementById("txtDesciption").value = "";
           var elementTest = document.getElementById("post-new");
           elementTest.classList.remove("active");
-          document.getElementById("txtMilkFunction").value = "";
-              setSelectedOption({});
-              setSelectedOptionsList([])
         }
       } catch (err) {
         console.error(err);
@@ -75,55 +76,28 @@ export default function Order() {
   };
   const updateGroup = async () => {
     if (
-      document.getElementById("txtSelectCountry").value != "Chọn trường" &&
-      document.getElementById("txtSelectSchoolYear").value != ""
+      document.getElementById("txtOrderStatus").value != "" &&
+      document.getElementById("txtSelectPayment").value != ""
     ) {
-      let avtImg = null;
-      let bgImg = null;
-
-      for (let i = 0; i < imgNotSave.length; i++) {
-        if (imgNotSave[i].type == "avatar") {
-          avtImg = await saveImgInImgBB(imgNotSave[i].img);
-        } else {
-          bgImg = await saveImgInImgBB(imgNotSave[i].img);
-        }
-      }
-
-      if (avtImg == null) {
-        avtImg = groupRecent.avataImg;
-      }
-      if (bgImg == null) {
-        bgImg = groupRecent.backgroundImg;
-      }
       try {
-        const data = {
-          name: document.getElementById("txtName").value,
-          schoolYearId: document.getElementById("txtSelectSchoolYear").value,
-          policy: document.getElementById("txtPolicy").value,
-          backgroundImg: bgImg,
-          avataImg: avtImg,
-          description: document.getElementById("txtDesciption").value,
-          info: document.getElementById("txtInfomation").value,
-          groupAdminId:
-            groupRecent.groupAdminId != null ? groupRecent.groupAdminId : null,
-        };
-        const response = await axios.put(
-          `https://truongxuaapp.online/api/v1/groups?id=${groupRecent.id}`,
-          data,
+        const formData = new FormData();
+        formData.append('Id', schoolEdit);
+        formData.append('Status', document.getElementById("txtOrderStatus").value);
+        formData.append('StatusPayment', document.getElementById("txtSelectPayment").value);
+        const response = await axios.post(
+          `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Order/updatestatus`,
+          formData,
           {
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "multipart/form-data",
               Authorization: "Bearer " + localStorage.authorization,
             },
           }
         );
         if (response.status === 200) {
           await getAllOrder();
-          alert("Cập nhập nhóm thành công ");
-          setImgNotSave([]);
+          alert("Cập nhật trạng thái đơn hàng thành công ");
           setStateAdd("Create");
-          document.getElementById("txtName").value = "";
-          document.getElementById("txtDesciption").value = "";
           var elementTest = document.getElementById("post-new");
           elementTest.classList.remove("active");
         }
@@ -137,7 +111,7 @@ export default function Order() {
   const getGroupRecent = async (id) => {
     try {
       const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/groups/${id}`,
+        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Order/GetOrder?id=${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -146,81 +120,17 @@ export default function Order() {
         }
       );
       if (response.status === 200) {
+        console.log(response.data)
         setGroupRecent(response.data);
-        document.getElementById("txtName").value = response.data.name;
-        document.getElementById("txtDesciption").value =
-          response.data.description;
-        document.getElementById("txtSelectCountry").value = response.data.nation;
+        document.getElementById("txtOrderStatus").value = response.data.status;
+        document.getElementById("txtSelectPayment").value = response.data.statusPayment;
         setSchoolEdit(id);
-        await getAllSchool();
       }
     } catch (err) {
       
       console.error(err);
     }
   };
-  const getSchoolIdBySchoolYearId = async (schoolYearId) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/schools/schoolyears/${schoolYearId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        return response.data.schoolId;
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const saveImgInImgBB = async (img) => {
-    let body = new FormData();
-    body.set("key", "71b6c3846105c92074f8e9a49b85887f");
-    body.append("image", img);
-    try {
-      const response = await axios({
-        method: "POST",
-        url: "https://api.imgbb.com/1/upload",
-        data: body,
-      });
-      if (response.status == 200) {
-        console.log(response.data.data.display_url);
-        return response.data.data.display_url;
-        // dataImgSave = {
-        //   name: response.data.data.title,
-        //   url_display: response.data.data.display_url,
-        // };
-        // return dataImgSave.url_display;
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const getAllSchool = async () => {
-    try {
-      const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/GetAllCompany",
-        {
-          headers: {
-            
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      
-      if (response.status === 200) {
-        setSchools(response.data.data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
 
   const getAllOrdder = async () => {
     try {
@@ -246,60 +156,6 @@ export default function Order() {
 
     const [selectedOptionsList, setSelectedOptionsList] = useState([]);
 
-    // Handler function to update selected option
-    const handleOptionChange = (e) => {
-      const selectedOptionId = e.target.value;
-      if(selectedOptionId != null){
-        const option = milkFunction.find(opt => opt.id === selectedOptionId);
-        setSelectedOption(option);
-      }
-        
-    };
-
-    // Handler function for button click
-    const handleAddButtonClick = (e) => {
-        
-        e.preventDefault()     
-        if (selectedOption) {
-          const option = selectedOptionsList.find(opt => opt.id === selectedOption.id);
-          if(option != null) return;
-          setSelectedOptionsList([...selectedOptionsList, selectedOption]);
-          setSelectedOption('');
-      }
-    };
-
-    const handleDeleteOption = (e, index) => {
-      e.preventDefault()
-      const updatedOptions = [...selectedOptionsList];
-      updatedOptions.splice(index, 1);
-      setSelectedOptionsList(updatedOptions);
-  };
-
-  const renderAllSchool = (selectIndex) => {
-    return schools.map((element, index) => {
-      if (selectIndex == undefined) {
-        return (
-          <option value={element.id} key={index}>
-            {element.name}
-          </option>
-        );
-      } else {
-        if (selectIndex == element.id) {
-          return (
-            <option value={element.id} key={index} selected>
-              {element.name}
-            </option>
-          );
-        } else {
-          return (
-            <option value={element.id} key={index}>
-              {element.name}
-            </option>
-          );
-        }
-      }
-    });
-  };
   const onChangeSelect = async (event) => {
   };
   const getAllOrder = async () => {
@@ -320,21 +176,6 @@ export default function Order() {
       console.error(err);
     }
   };
-  const deleteImageInPost = async (idImage) => {
-    try {
-      const response = await axios.delete(
-        `https://truongxuaapp.online/api/v1/images/${idImage}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const [brandFunction, setBrandFuction] = useState()
   const [brandFunctions, setBrandFuctions] = useState([])
@@ -342,31 +183,6 @@ export default function Order() {
     const updatedFunctions = [...brandFunctions];
     updatedFunctions.splice(index, 1);
     setBrandFuctions(updatedFunctions);
-  };
-  const addFunction = (e) => {
-    e.preventDefault();
-    if (brandFunction != null && brandFunction != "") {
-      setBrandFuctions(brandFunctions => [...brandFunctions, brandFunction])
-      console.log(brandFunctions)
-      console.log(brandFunction)
-      setBrandFuction("")
-    }
-  }
-
-  const deleteCommentInPost = async (idComment) => {
-    try {
-      const response = await axios.delete(
-        `https://truongxuaapp.online/api/v1/posts/comments/${idComment}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-    } catch (err) {
-      console.error(err);
-    }
   };
 
   const deleteAGroup = async (idGroup) => {
@@ -394,8 +210,8 @@ export default function Order() {
       return (
         <tr key={index}>
           <td>{element.id}</td>
-          <td>{element.status}</td>
-          <td>{element.statusPayment}</td>
+          <td>{statusTranslations[element.status]}</td>
+          <td>{element.statusPayment == "WAIT REFUNDED" ? "Chờ hoàn tiền" : statusTranslations[element.statusPayment]}</td>
           <td>{element.address}</td>
           <td>{element.createDate}</td>
 
@@ -414,7 +230,7 @@ export default function Order() {
             >
               <i className="icofont-trash" />
             </div>
-            <div
+            {element.status != "DELIVERED" && <div
               onClick={() => {
                 var elementTest = document.getElementById("post-new");
                 elementTest.classList.add("active");
@@ -426,6 +242,7 @@ export default function Order() {
             >
               <i className="icofont-pen-alt-1" />
             </div>
+    }
             <div
               onClick={(e) => {
                 history.push(`/orderDetail?id=${element.id}`)
@@ -1053,9 +870,6 @@ export default function Order() {
               var element = document.getElementById("post-new");
               element.classList.remove("active");
               setStateAdd("Create");
-              document.getElementById("txtName").value = "";
-              document.getElementById("txtDesciption").value = "";
-              document.getElementById("txtMilkFunction").value = "";
               setSelectedOption({});
               setSelectedOptionsList([])
               //setElementUpdate(undefined);
@@ -1095,7 +909,7 @@ export default function Order() {
                   }}
                   id="popup-head-name"
                 >
-                  Tạo thương hiệu
+                  Cập nhật đơn hàng
                 </p>
               </h5>
             </div>
@@ -1118,24 +932,29 @@ export default function Order() {
                     width: "20%",
                   }}
                 >
-                  Chọn công ty:{" "}
+                  Chọn Trạng thái đơn:{" "}
                 </p>
                 <select
                   onChange={onChangeSelect}
-                  id="txtSelectCountry"
+                  id="txtOrderStatus"
                   style={{
                     padding: 10,
                     width: "30%",
                     marginRight: 10,
                   }}
                 >
-                  <option>Chọn công ty</option>
-                  {stateAdd == "Create"
-                    ? renderAllSchool()
-                    : renderAllSchool(schoolEdit)}
+                  <option>Chọn trạng thái đơn hàng</option>
+                  <option value="PROCESSING">Chờ xác nhận</option>
+                  <option value="DELIVERING">Đang giao hàng</option>
+                  <option value="DELIVERED">Đã giao hàng</option>
+                  <option value="CANCEL">Hủy</option>
                 </select>
               </div>
-              
+
+
+
+
+
               <div
                 style={{
                   display: "flex",
@@ -1150,105 +969,24 @@ export default function Order() {
                     width: "20%",
                   }}
                 >
-                  Tên thương hiệu:{" "}
+                  Chọn Trạng thái thanh toán:{" "}
                 </p>
-                <input
-                  required
-                  placeholder="Tên của thương hiệu"
+                <select
+                  onChange={onChangeSelect}
+                  id="txtSelectPayment"
                   style={{
-                    width: "100%",
                     padding: 10,
-                  }}
-                  id="txtName"
-                />
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  marginTop: 20,
-                  alignItems: "baseline",
-                }}
-              >
-
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  marginTop: 20,
-                  alignItems: "baseline",
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 700,
-                    width: "20%",
+                    width: "30%",
+                    marginRight: 10,
                   }}
                 >
-                  Mô tả:{" "}
-                </p>
-                <input
-                  required
-                  placeholder="Mô tả của thương hiệu"
-                  style={{
-                    width: "100%",
-                    padding: 10,
-                  }}
-                  id="txtDesciption"
-                />
-
-
-
-
-
+                  <option>Chọn trạng thái thanh toán</option>
+                  <option value="PAID">Đã thanh toán</option>
+                  <option value="UNPAID">Chưa thanh toán</option>
+                  <option value="REFUNDED">Đã hoàn tiền</option>
+                  <option value="WAIT REFUNDED">Đợi hoàn tiền</option>
+                </select>
               </div>
-              <div style={{
-                  display: "flex",
-                  marginTop: 20,
-                  alignItems: "baseline",
-                }}>
-            {/* Dropdown list */}
-            <p
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 700,
-                    width: "20%",
-                  }}
-                >
-                  Chọn dòng sữa:{" "}
-                </p>
-            <select
-             style={{
-              padding: 10,
-              width: "30%",
-              marginRight: 10,
-            }}
-            id="txtMilkFunction"
-            value={selectedOption && selectedOption.id}
-            onChange={handleOptionChange}>
-                <option value="">Select an option</option>
-                {milkFunction && milkFunction.map(option => (
-                    <option key={option.id} value={option.id} name={option.name}>{option.name}</option>
-                ))}
-            </select>
-
-            {/* Button to add */}
-            <button onClick={handleAddButtonClick}>Add</button>
-
-            {selectedOptionsList.length > 0 && (
-                <div>
-                    <h3>Selected Options:</h3>
-                    <ul>
-                        {selectedOptionsList.map((option, index) => (
-                            <li key={index}>
-                                {option.name}
-                                <button onClick={(e) => handleDeleteOption(e, index)}>Delete</button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-        </div>
               <div  >
             <ul>
         {brandFunctions.map((func, index) => (
@@ -1288,7 +1026,7 @@ export default function Order() {
                   marginRight: "auto",
                 }}
               >
-                Tạo Thương Hiệu
+                Cập nhật
               </button>
             </form>
           </div>

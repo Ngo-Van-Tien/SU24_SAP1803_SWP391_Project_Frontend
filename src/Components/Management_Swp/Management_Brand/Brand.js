@@ -1,7 +1,8 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import SideBar from "../../Sidebar/SideBar";
-import ReactDOM from 'react-dom';
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import ReactDOM from "react-dom";
 
 export default function Brand() {
   const [groups, setGroups] = useState([]);
@@ -11,11 +12,30 @@ export default function Brand() {
   const [imgNotSave, setImgNotSave] = useState([]);
   const [groupRecent, setGroupRecent] = useState({});
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
-
+  const history = useHistory();
   useEffect(async () => {
     await getAllSchool();
     await getAllGroups();
   }, []);
+
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+
+  const handleDeleteImage = () => {
+    setSelectedFile(null);
+    URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+    document.getElementById("txtImage").value = "";
+  };
 
   const clickToUpdate = async (id) => {
     await getGroupRecent(id);
@@ -29,19 +49,24 @@ export default function Brand() {
     }
   };
   const addGroup = async () => {
-    if (
-      document.getElementById("txtSelectCountry").value != "Chọn công ty"
-    ) {
+    if (document.getElementById("txtSelectCountry").value != "Chọn công ty") {
       try {
-        const ids = selectedOptionsList.map(option => option.id);
         const formData = new FormData();
-        formData.append('Name', document.getElementById("txtName").value);
-        formData.append('Description', document.getElementById("txtDesciption").value);
-        formData.append('CompanyId', document.getElementById("txtSelectCountry").value);
-        selectedOptionsList.forEach((item, index) => {
-          formData.append('MilkFunctionIds', item.id);
-      });
-        
+        formData.append("Name", document.getElementById("txtName").value);
+        formData.append(
+          "Description",
+          document.getElementById("txtDesciption").value
+        );
+        formData.append(
+          "CompanyId",
+          document.getElementById("txtSelectCountry").value
+        );
+
+        const imageInput = document.getElementById("txtImage");
+        if (imageInput.files.length > 0) {
+          formData.append("Image", imageInput.files[0]);
+        }
+
         const response = await axios.post(
           "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/AddMilkBrand",
           formData,
@@ -49,7 +74,6 @@ export default function Brand() {
             headers: {
               "Content-Type": "multipart/form-data",
               Authorization: "Bearer " + localStorage.authorization,
-
             },
           }
         );
@@ -61,9 +85,10 @@ export default function Brand() {
           document.getElementById("txtDesciption").value = "";
           var elementTest = document.getElementById("post-new");
           elementTest.classList.remove("active");
-          document.getElementById("txtMilkFunction").value = "";
-              setSelectedOption({});
-              setSelectedOptionsList([])
+          document.getElementById("txtImage").value = "";
+          setSelectedOption({});
+          setSelectedOptionsList([]);
+          handleDeleteImage();
         }
       } catch (err) {
         console.error(err);
@@ -125,6 +150,7 @@ export default function Brand() {
           document.getElementById("txtDesciption").value = "";
           var elementTest = document.getElementById("post-new");
           elementTest.classList.remove("active");
+          handleDeleteImage();
         }
       } catch (err) {
         console.error(err);
@@ -136,7 +162,7 @@ export default function Brand() {
   const getGroupRecent = async (id) => {
     try {
       const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/groups/${id}`,
+        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/GetById?id=${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -145,16 +171,18 @@ export default function Brand() {
         }
       );
       if (response.status === 200) {
+        console.log(response.data);
         setGroupRecent(response.data);
-        document.getElementById("txtName").value = response.data.name;
+        document.getElementById("txtName").value = response.data.milkBrand.name;
         document.getElementById("txtDesciption").value =
-          response.data.description;
-        document.getElementById("txtSelectCountry").value = response.data.nation;
-        setSchoolEdit(id);
+          response.data.milkBrand.description;
+        setPreviewUrl(
+          `data:image/png;base64, ${response.data.milkBrand.image.content}`
+        );
+        setSchoolEdit(response.data.milkBrand.company.id);
         await getAllSchool();
       }
     } catch (err) {
-      
       console.error(err);
     }
   };
@@ -206,12 +234,11 @@ export default function Brand() {
         "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/GetAllCompany",
         {
           headers: {
-            
             Authorization: "Bearer " + localStorage.authorization,
           },
         }
       );
-      
+
       if (response.status === 200) {
         setSchools(response.data.data);
       }
@@ -219,7 +246,6 @@ export default function Brand() {
       console.error(err);
     }
   };
-
 
   const getAllMilkFunction = async () => {
     try {
@@ -243,35 +269,35 @@ export default function Brand() {
   const [selectedOption, setSelectedOption] = useState({});
   const [milkFunction, setMilkFunction] = useState();
 
-    const [selectedOptionsList, setSelectedOptionsList] = useState([]);
+  const [selectedOptionsList, setSelectedOptionsList] = useState([]);
 
-    // Handler function to update selected option
-    const handleOptionChange = (e) => {
-      const selectedOptionId = e.target.value;
-      if(selectedOptionId != null){
-        const option = milkFunction.find(opt => opt.id === selectedOptionId);
-        setSelectedOption(option);
-      }
-        
-    };
+  // Handler function to update selected option
+  const handleOptionChange = (e) => {
+    const selectedOptionId = e.target.value;
+    if (selectedOptionId != null) {
+      const option = milkFunction.find((opt) => opt.id === selectedOptionId);
+      setSelectedOption(option);
+    }
+  };
 
-    // Handler function for button click
-    const handleAddButtonClick = (e) => {
-        
-        e.preventDefault()     
-        if (selectedOption) {
-          const option = selectedOptionsList.find(opt => opt.id === selectedOption.id);
-          if(option != null) return;
-          setSelectedOptionsList([...selectedOptionsList, selectedOption]);
-          setSelectedOption('');
-      }
-    };
+  // Handler function for button click
+  const handleAddButtonClick = (e) => {
+    e.preventDefault();
+    if (selectedOption) {
+      const option = selectedOptionsList.find(
+        (opt) => opt.id === selectedOption.id
+      );
+      if (option != null) return;
+      setSelectedOptionsList([...selectedOptionsList, selectedOption]);
+      setSelectedOption("");
+    }
+  };
 
-    const handleDeleteOption = (e, index) => {
-      e.preventDefault()
-      const updatedOptions = [...selectedOptionsList];
-      updatedOptions.splice(index, 1);
-      setSelectedOptionsList(updatedOptions);
+  const handleDeleteOption = (e, index) => {
+    e.preventDefault();
+    const updatedOptions = [...selectedOptionsList];
+    updatedOptions.splice(index, 1);
+    setSelectedOptionsList(updatedOptions);
   };
 
   const renderAllSchool = (selectIndex) => {
@@ -299,16 +325,15 @@ export default function Brand() {
       }
     });
   };
-  const onChangeSelect = async (event) => {
-  };
+  const onChangeSelect = async (event) => {};
   const getAllGroups = async () => {
     try {
       const response = await axios.get(
         "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/GetAllMilkBrand",
         {
           headers: {
-           "Content-Type": "multipart/form-data",
-           Authorization: "Bearer " + localStorage.authorization,
+            "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + localStorage.authorization,
           },
         }
       );
@@ -335,8 +360,8 @@ export default function Brand() {
     }
   };
 
-  const [brandFunction, setBrandFuction] = useState()
-  const [brandFunctions, setBrandFuctions] = useState([])
+  const [brandFunction, setBrandFuction] = useState();
+  const [brandFunctions, setBrandFuctions] = useState([]);
   const deleteFunction = (index) => {
     const updatedFunctions = [...brandFunctions];
     updatedFunctions.splice(index, 1);
@@ -345,12 +370,12 @@ export default function Brand() {
   const addFunction = (e) => {
     e.preventDefault();
     if (brandFunction != null && brandFunction != "") {
-      setBrandFuctions(brandFunctions => [...brandFunctions, brandFunction])
-      console.log(brandFunctions)
-      console.log(brandFunction)
-      setBrandFuction("")
+      setBrandFuctions((brandFunctions) => [...brandFunctions, brandFunction]);
+      console.log(brandFunctions);
+      console.log(brandFunction);
+      setBrandFuction("");
     }
-  }
+  };
 
   const deleteCommentInPost = async (idComment) => {
     try {
@@ -423,7 +448,14 @@ export default function Brand() {
             >
               <i className="icofont-pen-alt-1" />
             </div>
-            
+            <div
+              onClick={(e) => {
+                history.push(`/brandDetail?id=${element.id}`);
+              }}
+              className="button soft-primary"
+            >
+              <i className="icofont-eye-open" />
+            </div>
           </td>
         </tr>
       );
@@ -792,10 +824,10 @@ export default function Brand() {
               <h4 className="main-title">Quản lý thương hiệu</h4>
               <button
                 className="main-btn"
-                onClick={ async () => {
+                onClick={async () => {
                   var element = document.getElementById("post-new");
                   element.classList.add("active");
-                  await getAllMilkFunction()
+                  await getAllMilkFunction();
                 }}
                 style={{
                   padding: 10,
@@ -835,14 +867,9 @@ export default function Brand() {
               </div>
               <div className="row merged20 mb-4">
                 <div className="col-lg-6">
-                  <div className="d-widget">
-
-
-                  </div>
+                  <div className="d-widget"></div>
                 </div>
-
               </div>
-
             </div>
           </div>
         </div>
@@ -1042,7 +1069,10 @@ export default function Brand() {
       </div>
       {/* side slide message & popup */}
       <div id="post-new" className="post-new-popup">
-        <div className="popup" style={{ width: "800px" }}>
+        <div
+          className="popup"
+          style={{ width: "800px", overflowY: "scroll" }}
+        >
           <span
             onClick={() => {
               var element = document.getElementById("post-new");
@@ -1050,9 +1080,9 @@ export default function Brand() {
               setStateAdd("Create");
               document.getElementById("txtName").value = "";
               document.getElementById("txtDesciption").value = "";
-              document.getElementById("txtMilkFunction").value = "";
               setSelectedOption({});
-              setSelectedOptionsList([])
+              setSelectedOptionsList([]);
+              handleDeleteImage();
               //setElementUpdate(undefined);
             }}
             className="popup-closed"
@@ -1130,7 +1160,7 @@ export default function Brand() {
                     : renderAllSchool(schoolEdit)}
                 </select>
               </div>
-              
+
               <div
                 style={{
                   display: "flex",
@@ -1163,9 +1193,7 @@ export default function Brand() {
                   marginTop: 20,
                   alignItems: "baseline",
                 }}
-              >
-
-              </div>
+              ></div>
               <div
                 style={{
                   display: "flex",
@@ -1191,85 +1219,53 @@ export default function Brand() {
                   }}
                   id="txtDesciption"
                 />
-
-
-
-
-
               </div>
-              <div style={{
+              <div
+                style={{
                   display: "flex",
                   marginTop: 20,
                   alignItems: "baseline",
-                }}>
-            {/* Dropdown list */}
-            <p
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 700,
-                    width: "20%",
-                  }}
-                >
-                  Chọn Chức năng sữa:{" "}
-                </p>
-            <select
-             style={{
-              padding: 10,
-              width: "30%",
-              marginRight: 10,
-            }}
-            id="txtMilkFunction"
-            value={selectedOption && selectedOption.id}
-            onChange={handleOptionChange}>
-                <option value="">Select an option</option>
-                {milkFunction && milkFunction.map(option => (
-                    <option key={option.id} value={option.id} name={option.name}>{option.name}</option>
-                ))}
-            </select>
-
-            {/* Button to add */}
-            <button onClick={handleAddButtonClick}>Add</button>
-
-            {selectedOptionsList.length > 0 && (
-                <div>
-                    <h3>Selected Options:</h3>
-                    <ul>
-                        {selectedOptionsList.map((option, index) => (
-                            <li key={index}>
-                                {option.name}
-                                <button onClick={(e) => handleDeleteOption(e, index)}>Delete</button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-        </div>
-              <div  >
-            <ul>
-        {brandFunctions.map((func, index) => (
-          <li key={index}>
-            {func}
-            <button onClick={() => deleteFunction(index)}>
-              {/* Icon Delete using Unicode or SVG */}
-              <svg
-                onClick={() => deleteFunction(index)}
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                className="bi bi-x"
-                viewBox="0 0 16 16"
+                }}
               >
-                <path
-                  fillRule="evenodd"
-                  d="M10.354 5.354a.5.5 0 0 1 0 .708L8.707 8l1.647 1.646a.5.5 0 0 1-.708.708L8 8.707 6.354 10.354a.5.5 0 0 1-.708-.708L7.293 8 5.646 6.354a.5.5 0 0 1 .708-.708L8 7.293l1.646-1.647a.5.5 0 0 1 .708 0z"
+                <p style={{ fontSize: 20, fontWeight: 700, width: "20%" }}>
+                  Hình ảnh:{" "}
+                </p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  required
+                  style={{ width: "100%", padding: 10 }}
+                  id="txtImage"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    handleFileChange(e);
+                    // Xử lý tệp hình ảnh ở đây
+                  }}
                 />
-              </svg>
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+              </div>
+              <div className="page-break"></div>
+              {previewUrl && (
+                <div style={{ position: "relative" }}>
+                  {stateAdd == "Create" && (
+                    <button
+                      style={{
+                        position: "absolute",
+                        top: "5px",
+                        left: "200px",
+                        zIndex: "10",
+                      }}
+                      onClick={handleDeleteImage}
+                    >
+                      X
+                    </button>
+                  )}
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    style={{ maxWidth: "200px", maxHeight: "150px" }}
+                  />
+                </div>
+              )}
               <button
                 className="main-btn"
                 style={{

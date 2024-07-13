@@ -309,7 +309,7 @@ export default function Schools() {
     return school.map((element, index) => {
       return (
         <tr key={index}>
-          <td>{element.id}</td>
+          <td>{index}</td>
           <td>{element.product.name}</td>
           <td>{element.quantity}</td>
           <td>{element.price}</td>
@@ -867,7 +867,7 @@ export default function Schools() {
                     <table className="table table-default all-events table-striped table-responsive-lg">
                       <thead>
                         <tr>
-                          <th>ID#</th>
+                          <th>STT</th>
                           <th>Tên</th>
                           <th>Số lượng</th>
                           <th>Gía</th>

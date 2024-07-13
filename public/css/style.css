@@ -911,15 +911,7 @@ header.transparent .topbar {
 	opacity: 1;
 	visibility: visible;
 }
-.popup::after {
-	border-bottom: 8px solid;
-	bottom: 0;
-	content: "";
-	left: 0;
-	opacity: 1;
-	position: absolute;
-	width: 100%;
-}
+
 .popup {
 	background: #fff none repeat scroll 0 0;
 	border-radius: 5px;
@@ -5781,5 +5773,16 @@ body.nightview {
 	color: white !important;
 	padding: 10px 0px !important;
   } */
+
+  .page-break {
+	page-break-before: always; /* Forces the next content to the next page */
+	height: 0;
+  }
+  .button.soft-info {
+    margin-left: 10px;
+}
+
+
+  
   
 

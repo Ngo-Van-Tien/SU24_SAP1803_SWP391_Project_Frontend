@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import SideBar from "../../Sidebar/SideBar";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function Product() {
   const [groups, setGroups] = useState([]);
@@ -11,6 +12,7 @@ export default function Product() {
   const [groupRecent, setGroupRecent] = useState({});
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
   const [nutrientData, setNutrientData] = useState([]);
+  const history = useHistory()
   useEffect(async () => {
     await getAllSchool();
     await getAllGroups();
@@ -38,17 +40,14 @@ export default function Product() {
         formData.append('StartAge', document.getElementById("txtstartAge").value);
         formData.append('EndAge', document.getElementById("txtendAge").value);
         formData.append('MilkBrandId', document.getElementById("txtMilkBrandId").value);
-        const nutrients  = nutrientsList.map(item => ({
-          nutrientId: item.nutrientId,
-          in100g: item.in100g,
-          inCup: item.inCup,
-          unit: item.unit
-        }));
+        // const nutrients  = nutrientsList.map(item => ({
+        //   nutrientId: item.nutrientId,
+        //   in100g: item.in100g,
+        //   inCup: item.inCup,
+        //   unit: item.unit
+        // }));
 
-        nutrients.forEach((item, index) => {
-          formData.append('Data', JSON.stringify(item));
-          console.log(JSON.stringify(item))
-      });
+        
       
         
         // Lấy tệp hình ảnh từ input
@@ -232,6 +231,10 @@ export default function Product() {
       console.error(err);
     }
   };
+
+
+
+  
 
 
   const getAllNutrient = async () => {
@@ -435,9 +438,20 @@ export default function Product() {
   };
   const deleteAGroup = async (idGroup) => {
     try {
-      const response = await axios.delete(
-        `https://localhost:7043/api/MilkBrand/delete milk brand?Id=${idGroup}`
-      );
+      const formData = new FormData();
+      formData.append('Id', idGroup);
+  
+      const response = await axios.request({
+        method: 'DELETE',
+        url: 'http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/Delete',
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhZG1pbkBlbWFpbC5jb20iLCJzdWIiOiIzYWM1OWMyMy03ZWM0LTRkMzItYTIyNC02OGRmZDk5ODBmZTAiLCJlbWFpbCI6ImFkbWluQGVtYWlsLmNvbSIsIkZpcnN0TmFtZSI6ImFkbWluIiwiTGFzdE5hbWUiOiJhZG1pbiIsIlBob25lTnVtYmVyIjoiKzExMTExMTExMTExMSIsIkFkZHJlc3MiOiJMb2NhdGlvbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzIwODQ2NzAwLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo1MTA2IiwiYXVkIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NTEwNiJ9.iDgnWoB2ckcAnTGB6NinLpmVK8OisIUhFvR_O5PPSnM',
+          'Content-Type': 'multipart/form-data'
+        },
+        data: formData
+      });
+  
       if (response.status === 200) {
         document.getElementById("delete-post").classList.remove("active");
         alert("Xóa thành công thương hiệu");
@@ -447,11 +461,16 @@ export default function Product() {
       console.log(err);
     }
   };
+  
+  
+ 
+  
   const renderAllGroups = () => {
     return groups.map((element, index) => {
       return (
         <tr key={index}>
-          <td>{element.id}</td>
+         
+          <td>{index+1}</td>
           <td>{element.name}</td>
           <td>{element.description}</td>
           <td>{element.startAge}</td>
@@ -468,6 +487,7 @@ export default function Product() {
           </td>
 
           <td>
+
             <div
               onClick={() => {
                 var elementTest = document.getElementById("delete-post");
@@ -480,7 +500,9 @@ export default function Product() {
               className="button soft-danger"
             >
               <i className="icofont-trash" />
+              
             </div>
+            
             <div
               onClick={() => {
                 var elementTest = document.getElementById("post-new");
@@ -492,6 +514,14 @@ export default function Product() {
               className="button soft-primary"
             >
               <i className="icofont-pen-alt-1" />
+            </div>
+            <div
+              onClick={(e) => {
+                history.push(`/productNutrient?id=${element.id}`)
+              }}
+              className="button soft-primary"
+            >
+              <i className="icofont-eye-open" />
             </div>
           </td>
         </tr>
@@ -886,7 +916,7 @@ export default function Product() {
                     <table className="table table-default all-events table-striped table-responsive-lg">
                       <thead>
                         <tr>
-                          <th>ID#</th>
+                          <th>STT</th>
                           <th>Tên Sản Phẩm</th>
                           <th>Thông Tin</th>
                           <th>Tuổi bắt đầu</th>
@@ -1284,8 +1314,8 @@ export default function Product() {
               </div>
 
               <div>
-      <h3>Add Nutrient Data</h3>
-      <div>
+      {/* <h3>Add Nutrient Data</h3> */}
+      {/* <div>
         <label>Nutrient ID:</label>
         <select
           name="nutrientId"
@@ -1297,8 +1327,8 @@ export default function Product() {
             <option key={nutrient.id} value={nutrient.id}>{nutrient.name}</option>
           ))}
         </select>
-      </div>
-      <div>
+      </div> */}
+      {/* <div>
         <label>In 100g:</label>
         <input
           type="number"
@@ -1306,8 +1336,8 @@ export default function Product() {
           value={formData.in100g}
           onChange={handleChange}
         />
-      </div>
-      <div>
+      </div> */}
+      {/* <div>
         <label>In Cup:</label>
         <input
           type="number"
@@ -1315,8 +1345,8 @@ export default function Product() {
           value={formData.inCup}
           onChange={handleChange}
         />
-      </div>
-      <div>
+      </div> */}
+      {/* <div>
         <label>Unit:</label>
         <input
           type="text"
@@ -1324,11 +1354,11 @@ export default function Product() {
           value={formData.unit}
           onChange={handleChange}
         />
-      </div>
-      <button onClick={handleAdd}>Add</button>
+      </div> */}
+      {/* <button onClick={handleAdd}>Add</button> */}
 
       {/* Display added nutrients */}
-      <div>
+      {/* <div>
         <h4>Added Nutrients:</h4>
         <ul>
           {nutrientsList.map((nutrient, index) => (
@@ -1338,7 +1368,7 @@ export default function Product() {
             </li>
           ))}
         </ul>
-      </div>
+      </div> */}
     </div>
 
 

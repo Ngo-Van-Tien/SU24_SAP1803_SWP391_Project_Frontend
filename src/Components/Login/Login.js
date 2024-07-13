@@ -52,10 +52,10 @@ export default function Login(props) {
                 />
                 <img
                   style={{
-                    width: 365,
-                    height: 450,
+                    width: 360,
+                    height: 400,
                   }}
-                  src="https://photo2.tinhte.vn/data/attachment-files/2020/12/5261326_2943_nhmr.jpg"
+                  src="https://png.pngtree.com/png-clipart/20210829/original/pngtree-start-salesman-service-hand-drawn-cartoon-elements-png-image_6675720.jpg"
                   alt="PicturebyAutumnStudio"
                   className="box__image"
                 />

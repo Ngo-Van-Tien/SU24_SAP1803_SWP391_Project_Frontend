@@ -13,9 +13,28 @@ export default function Group() {
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
 
   useEffect(async () => {
-    getAllSchool();
+    await getAllSchool();
     await getAllGroups();
   }, []);
+
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+
+  const handleDeleteImage = () => {
+    setSelectedFile(null);
+    URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+    document.getElementById("txtImage").value = "";
+  };
 
   const clickToUpdate = async (id) => {
     await getGroupRecent(id);
@@ -29,57 +48,76 @@ export default function Group() {
     }
   };
   const addGroup = async () => {
-    if (
-      document.getElementById("txtSelectCountry").value != "Chọn quốc gia"
-    ) {
-        try {
-          const data = {
-            Name: document.getElementById("txtName").value,
-            Description: document.getElementById("txtDesciption").value,
-            Nation: document.getElementById("txtSelectCountry").value
-          };
-          const formData = new FormData();
-          formData.append('Name', document.getElementById("txtName").value);  
-          formData.append('Description', document.getElementById("txtDesciption").value); 
-          formData.append('Nation', document.getElementById("txtSelectCountry").value); 
-          console.log(data)
-          const response = await axios.post(
-            "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/AddCompany",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-                Authorization: "Bearer " + localStorage.authorization,
-              },
-            }
-          );
-          if (response.status === 200) {
-            await getAllGroups();
-            alert("Tạo company thành công");
-            setStateAdd("Create");
-            document.getElementById("txtName").value = "";
-            document.getElementById("txtDesciption").value = "";
-            var elementTest = document.getElementById("post-new");
-            elementTest.classList.remove("active");
-          }
-        } catch (err) {
-          console.error(err);
+    if (document.getElementById("txtSelectCountry").value != "Chọn quốc gia") {
+      try {
+        const data = {
+          Name: document.getElementById("txtName").value,
+          Description: document.getElementById("txtDesciption").value,
+          Nation: document.getElementById("txtSelectCountry").value,
+        };
+        const formData = new FormData();
+        formData.append("Name", document.getElementById("txtName").value);
+        formData.append(
+          "Description",
+          document.getElementById("txtDesciption").value
+        );
+        formData.append(
+          "Nation",
+          document.getElementById("txtSelectCountry").value
+        );
+        formData.append("Path", document.getElementById("txtLink").value);
+        const imageInput = document.getElementById("txtImage");
+        if (imageInput.files.length > 0) {
+          formData.append("Image", imageInput.files[0]);
         }
+        const response = await axios.post(
+          "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/AddCompany",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: "Bearer " + localStorage.authorization,
+            },
+          }
+        );
+        if (response.status === 200) {
+          await getAllGroups();
+          alert("Tạo company thành công");
+          setStateAdd("Create");
+          document.getElementById("txtName").value = "";
+          document.getElementById("txtDesciption").value = "";
+          document.getElementById("txtLink").value = "";
+          document.getElementById("txtImage").value = "";
+          var elementTest = document.getElementById("post-new");
+          handleDeleteImage();
+          elementTest.classList.remove("active");
+        }
+      } catch (err) {
+        console.error(err);
+      }
     } else {
       alert("Có lỗi rồi");
     }
   };
   const updateGroup = async () => {
-    if (
-      document.getElementById("txtSelectCountry").value != "Chọn quốc gia"
-    ) {
+    if (document.getElementById("txtSelectCountry").value != "Chọn quốc gia") {
       try {
         const formData = new FormData();
-          formData.append('Id', schoolEdit); 
-          formData.append('Name', document.getElementById("txtName").value);  
-          formData.append('Description', document.getElementById("txtDesciption").value); 
-          formData.append('Nation', document.getElementById("txtSelectCountry").value); 
-          console.log(schoolEdit)
+        formData.append("Id", schoolEdit);
+        formData.append("Name", document.getElementById("txtName").value);
+        formData.append(
+          "Description",
+          document.getElementById("txtDesciption").value
+        );
+        formData.append(
+          "Nation",
+          document.getElementById("txtSelectCountry").value
+        );
+        formData.append("Path", document.getElementById("txtLink").value);
+        const imageInput = document.getElementById("txtImage");
+        if (imageInput.files.length > 0) {
+          formData.append("Image", imageInput.files[0]);
+        }
         const response = await axios.put(
           `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/UpdateCompany`,
           formData,
@@ -93,7 +131,7 @@ export default function Group() {
         if (response.status === 200) {
           await getAllGroups();
           alert("Cập nhập công ty thành công ");
-          
+          handleDeleteImage();
           setStateAdd("Create");
           document.getElementById("txtName").value = "";
           document.getElementById("txtDesciption").value = "";
@@ -111,7 +149,7 @@ export default function Group() {
   const getGroupRecent = async (id) => {
     try {
       const response = await axios.get(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/GetById/getbyid?id=${id}`,
+        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/GetById?id=${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -120,53 +158,19 @@ export default function Group() {
         }
       );
       if (response.status === 200) {
+        console.log(response.data);
         setGroupRecent(response.data);
-        document.getElementById("txtName").value = response.data.name;
-        document.getElementById("txtDesciption").value = response.data.description;
-        document.getElementById("txtSelectCountry").value = response.data.nation;
-        setSchoolEdit(id);
+        document.getElementById("txtName").value = response.data.company.name;
+        document.getElementById("txtDesciption").value =
+          response.data.company.description;
+        document.getElementById("txtSelectCountry").value =
+          response.data.company.nation;
+        document.getElementById("txtLink").value = response.data.company.path;
+        setPreviewUrl(
+          `data:image/png;base64, ${response.data.company.image.content}`
+        );
+        setSchoolEdit(response.data.company.nation);
         getAllSchool();
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const getSchoolIdBySchoolYearId = async (schoolYearId) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/schools/schoolyears/${schoolYearId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        return response.data.schoolId;
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const saveImgInImgBB = async (img) => {
-    let body = new FormData();
-    body.set("key", "71b6c3846105c92074f8e9a49b85887f");
-    body.append("image", img);
-    try {
-      const response = await axios({
-        method: "POST",
-        url: "https://api.imgbb.com/1/upload",
-        data: body,
-      });
-      if (response.status == 200) {
-        console.log(response.data.data.display_url);
-        return response.data.data.display_url;
-        // dataImgSave = {
-        //   name: response.data.data.title,
-        //   url_display: response.data.data.display_url,
-        // };
-        // return dataImgSave.url_display;
       }
     } catch (err) {
       console.error(err);
@@ -179,20 +183,20 @@ export default function Group() {
     return schools.map((element, index) => {
       if (selectIndex == undefined) {
         return (
-          <option value={element.id} key={index}>
+          <option value={element.name} key={index}>
             {element.name}
           </option>
         );
       } else {
-        if (selectIndex == element.id) {
+        if (selectIndex == element.name) {
           return (
-            <option value={element.id} key={index} selected>
+            <option value={element.name} key={index} selected>
               {element.name}
             </option>
           );
         } else {
           return (
-            <option value={element.id} key={index}>
+            <option value={element.name} key={index}>
               {element.name}
             </option>
           );
@@ -200,8 +204,7 @@ export default function Group() {
       }
     });
   };
-  const onChangeSelect = async (event) => {
-  };
+  const onChangeSelect = async (event) => {};
   const getAllGroups = async () => {
     try {
       const response = await axios.get(
@@ -290,27 +293,7 @@ export default function Group() {
       console.error(err);
     }
   };
-  const findPostByGroupId = async (groupId) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/posts/groupid?groupId=${groupId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        for (let i = 0; i < response.data.length; i++) {
-          getImageByPostId(response.data[i].id);
-          getCommentByPostId(response.data[i].id);
-        }
-      }
-    } catch (err) {
-      console.err(err);
-    }
-  };
+
   const deleteAGroup = async (idGroup) => {
     try {
       const response = await axios.delete(
@@ -333,7 +316,17 @@ export default function Group() {
           <td>{element.name}</td>
           <td className="text-success">{element.description}</td>
           <td>{element.nation}</td>
-
+          <td>{element.path}</td>
+          <td>
+            {" "}
+            {element.image && (
+              <img
+                src={`data:image/png;base64, ${element.image.content}`}
+                alt="Product Image"
+                style={{ width: "50px", height: "50px" }} // Adjust the width and height as needed
+              />
+            )}
+          </td>
           <td>
             <div
               onClick={() => {
@@ -757,6 +750,8 @@ export default function Group() {
                           <th>Tên công ty</th>
                           <th>Mô Tả</th>
                           <th>Quốc Gia</th>
+                          <th>Link</th>
+                          <th>Hình ảnh</th>
                           <th>Edit</th>
                         </tr>
                       </thead>
@@ -766,12 +761,8 @@ export default function Group() {
                 </div>
               </div>
               <div className="row merged20 mb-4">
-                <div className="col-lg-6">
-                  
-                </div>
-              
+                <div className="col-lg-6"></div>
               </div>
-            
             </div>
           </div>
         </div>
@@ -971,7 +962,10 @@ export default function Group() {
       </div>
       {/* side slide message & popup */}
       <div id="post-new" className="post-new-popup">
-        <div className="popup" style={{ width: "800px" }}>
+        <div
+          className="popup"
+          style={{ width: "800px", overflowY: "scroll" }}
+        >
           <span
             onClick={() => {
               var element = document.getElementById("post-new");
@@ -979,7 +973,7 @@ export default function Group() {
               setStateAdd("Create");
               document.getElementById("txtName").value = "";
               document.getElementById("txtDesciption").value = "";
-              //setElementUpdate(undefined);
+              handleDeleteImage();
             }}
             className="popup-closed"
           >
@@ -1088,8 +1082,32 @@ export default function Group() {
                   marginTop: 20,
                   alignItems: "baseline",
                 }}
+              ></div>
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: 20,
+                  alignItems: "baseline",
+                }}
               >
-              
+                <p
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    width: "20%",
+                  }}
+                >
+                  Đường dẫn:{" "}
+                </p>
+                <input
+                  required
+                  placeholder="Mô tả của nhóm"
+                  style={{
+                    width: "100%",
+                    padding: 10,
+                  }}
+                  id="txtLink"
+                />
               </div>
               <div
                 style={{
@@ -1117,6 +1135,52 @@ export default function Group() {
                   id="txtDesciption"
                 />
               </div>
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: 20,
+                  alignItems: "baseline",
+                }}
+              >
+                <p style={{ fontSize: 20, fontWeight: 700, width: "20%" }}>
+                  Hình ảnh:{" "}
+                </p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  required
+                  style={{ width: "100%", padding: 10 }}
+                  id="txtImage"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    handleFileChange(e);
+                    // Xử lý tệp hình ảnh ở đây
+                  }}
+                />
+              </div>
+              <div className="page-break"></div>
+              {previewUrl && (
+                <div style={{ position: "relative" }}>
+                  {stateAdd == "Create" && (
+                    <button
+                      style={{
+                        position: "absolute",
+                        top: "5px",
+                        left: "200px",
+                        zIndex: "10",
+                      }}
+                      onClick={handleDeleteImage}
+                    >
+                      X
+                    </button>
+                  )}
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    style={{ maxWidth: "200px", maxHeight: "150px" }}
+                  />
+                </div>
+              )}
               <button
                 className="main-btn"
                 style={{
@@ -1130,7 +1194,7 @@ export default function Group() {
                   marginRight: "auto",
                 }}
               >
-                { stateAdd == "Create" ? "Tạo Công Ty" : "Cập nhật" }
+                {stateAdd == "Create" ? "Tạo Công Ty" : "Cập nhật"}
               </button>
             </form>
           </div>

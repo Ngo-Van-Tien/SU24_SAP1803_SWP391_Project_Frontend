@@ -13,7 +13,7 @@ export default function MilkFuncion() {
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
 
   useEffect(async () => {
-    getAllSchool();
+    await getAllSchool();
     await getAllGroups();
   }, []);
 
@@ -112,7 +112,7 @@ export default function MilkFuncion() {
       );
       if (response.status === 200) {
         setGroupRecent(response.data);
-        document.getElementById("txtmilkfuncion").value = response.data.name;
+        document.getElementById("txtmilkfuncion").value = response.data.milkFunction.name;
         
         setSchoolEdit(id);
         getAllSchool();
@@ -171,7 +171,7 @@ export default function MilkFuncion() {
     return groups.map((element, index) => {
       return (
         <tr key={index}>
-          <td>{element.id}</td>
+          <td>{index+1}</td>
           <td>{element.name}</td>
           <td className="text-success">{element.description}</td>
           <td>
@@ -593,7 +593,7 @@ export default function MilkFuncion() {
                     <table className="table table-default all-events table-striped table-responsive-lg">
                       <thead>
                         <tr>
-                          <th>ID#</th>
+                          <th>STT</th>
                           <th>Chức năng sữa</th>
                           <th></th>
                           <th>Edit</th>

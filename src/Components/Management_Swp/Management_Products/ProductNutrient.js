@@ -2,8 +2,14 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import SideBar from "../../Sidebar/SideBar";
 import { Country } from "../../Country";
+import { useLocation, useHistory  } from "react-router-dom/cjs/react-router-dom.min";
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 
-export default function Nutrient() {
+
+
+export default function ProductNutrient() {
   const [groups, setGroups] = useState([]);
   const [schools, setSchools] = useState([]);
   const [stateAdd, setStateAdd] = useState("Create");
@@ -11,14 +17,24 @@ export default function Nutrient() {
 
   const [groupRecent, setGroupRecent] = useState({});
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
+  const [nutrient, setNutrient] = useState([]);
+  const onChangeSelect = async (event) => {
+  };
 
+  const [product, setProduct] = useState();
+    let query = useQuery();
+    let id = query.get('id');
+    const history = useHistory();
+    
   useEffect(async () => {
     await getAllSchool();
     await getAllGroups();
+    await getAllProductNutrient();
+    await getAllNutrient()
   }, []);
 
   const clickToUpdate = async (id) => {
-    await getGroupRecent(id);
+    
   };
   const changeSubmit = async (event) => {
     event.preventDefault();
@@ -28,42 +44,57 @@ export default function Nutrient() {
       await updateGroup();
     }
   };
+
   const addGroup = async () => {
-    
-    
-        try {
-          const data = {
-            milfuncion: document.getElementById("txtnutrient").value,
-           
-          };
-          const formData = new FormData();
-          formData.append('Name', document.getElementById("txtnutrient").value);  
-           
-          console.log(data)
-          const response = await axios.post(
-            "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/AddNutrient",
-            formData,
+    try {
+        
+        const nutrient = {
+
+            id: document.getElementById("txtSelectNutrient").value,
+            in100g: document.getElementById("txtin100g").value,
+            inCup: document.getElementById("txtincup").value,
+            unit: document.getElementById("txtunit").value
+        };
+        
+        const data= {
+          id: id,
+          nutrients: [nutrient]
+        }
+       
+        const response = await axios.post(
+            "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/Addnutrientsbyproductid",
+            data,
             {
-              headers: {
-                "Content-Type": "multipart/form-data",
-                Authorization: "Bearer " + localStorage.authorization,
-              },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + localStorage.authorization,
+                },
             }
-          );
-          if (response.status === 200) {
-            await getAllGroups();
-            alert("Tạo chất dinh dưỡng thành công");
+        );
+        
+        if (response.status === 200) {
+            await getAllProductNutrient();
+            alert("Thêm chất dinh dưỡng thành công");
             setStateAdd("Create");
-            document.getElementById("txtnutrient").value = "";
+            
+            
+            document.getElementById("txtSelectNutrient").value = "";
+            document.getElementById("txtin100g").value = "";
+            document.getElementById("txtincup").value = "";
+            document.getElementById("txtunit").value = "";
+            
             
             var elementTest = document.getElementById("post-new");
             elementTest.classList.remove("active");
-          }
-        } catch (err) {
-          console.error(err);
         }
-     
-  };
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+
+
+
   const updateGroup = async () => {
    
       
@@ -98,33 +129,124 @@ export default function Nutrient() {
       }
    
   };
-  const getGroupRecent = async (id) => {
+  const getAllProductNutrient = async () => {
     try {
-      console.log(id)
+        // Create a new FormData object
+        const formData = new FormData();
+        formData.append( "Id",id ); 
+
+        const response = await axios.post(
+            `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/getnutrientsbyproductid`, 
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: "Bearer " + localStorage.authorization,
+                },
+            }
+        );
+        if (response.status === 200) {
+            setProduct(response.data.data);
+            console.log(response.data.data);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+  const renderProductNutrient = () => {
+    return product.map((element, index) => {
+      return (
+        <tr key={index}>
+          <td>{index+1}</td>
+          <td>{element.name}</td>
+          <td>
+
+            <div
+              onClick={() => {
+                var elementTest = document.getElementById("delete-post");
+                elementTest.classList.add("active");
+                setDeleteGroupId(element);
+              }}
+              style={{
+                marginBottom: 10,
+              }}
+              className="button soft-danger"
+            >
+              <i className="icofont-trash" />
+              
+            </div>
+            
+            <div
+              onClick={() => {
+                var elementTest = document.getElementById("post-new");
+                elementTest.classList.add("active");
+                setStateAdd("Update");
+                setSchools([]);
+                clickToUpdate(element.id);
+              }}
+              className="button soft-primary"
+            >
+              <i className="icofont-pen-alt-1" />
+            </div>
+            
+          </td>
+        </tr>
+      );
+    });
+  };
+
+  const getAllNutrient = async () => {
+    try {
       const response = await axios.get(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/GetByIdNutrient?id=${id}`,
+        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/GetNutrients",
         {
           headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
             
+            Authorization: "Bearer " + localStorage.authorization,
           },
         }
       );
       
-
       if (response.status === 200) {
-        setGroupRecent(response.data);
-        document.getElementById("txtnutrient").value = response.data.name;
-        
-        setSchoolEdit(id);
-        getAllSchool();
+        setNutrient(response.data.data);
       }
     } catch (err) {
       console.error(err);
     }
   };
 
+  const renderAllNutrient = (selectIndex) => {
+    return nutrient.map((element, index) => {
+      if (selectIndex == undefined) {
+        return (
+          <option value={element.id} key={index}>
+            {element.name}
+          </option>
+        );
+      } else {
+        if (selectIndex == element.id) {
+          return (
+            <option value={element.id} key={index} selected>
+              {element.name}
+            </option>
+          );
+        } else {
+          return (
+            <option value={element.id} key={index}>
+              {element.name}
+            </option>
+          );
+        }
+      }
+    });
+  };
+
+
+
+
+
+ 
   const getAllSchool = () => {
     setSchools(Country);
   };
@@ -148,66 +270,43 @@ export default function Nutrient() {
     }
   };
 
- 
-
-  const deleteAGroup = async (idGroup) => {
+  const deleteAGroup = async (nutrient) => {
     try {
-      const response = await axios.delete(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkFunction/DeletetMilkFunction?id=${idGroup}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
+        console.log(nutrient);
+
+        // Tạo một đối tượng FormData
+        const formData = new FormData();
+        formData.append("Id", id);
+        formData.append("NutrientId", nutrient.id);
+
+        const response = await axios.post(
+            `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/deletenutrientsbyproductid`,
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: "Bearer " + localStorage.authorization,
+                }
+            }
+        );
+
+        if (response.status === 200) {
+            document.getElementById("delete-post").classList.remove("active");
+            alert("Xóa thành công chức năng sữa");
+            await getAllGroups();
         }
-      );
-      if (response.status === 200) {
-        document.getElementById("delete-post").classList.remove("active");
-        alert("Xóa thành công ty");
-        await getAllGroups();
-      }
     } catch (err) {
-      console.log(err);
+        if (err.response && err.response.status === 400) {
+            console.log("Validation errors occurred:", err.response.data.errors);
+        } else {
+            console.log(err);
+        }
     }
-  };
-  const renderAllGroups = () => {
-    return groups.map((element, index) => {
-      return (
-        <tr key={index}>
-          <td>{index+1}</td>
-          <td>{element.name}</td>
-          <td className="text-success">{element.description}</td>
-          <td>
-            <div
-              onClick={() => {
-                var elementTest = document.getElementById("delete-post");
-                elementTest.classList.add("active");
-                setDeleteGroupId(element.id);
-              }}
-              style={{
-                marginBottom: 10,
-              }}
-              className="button soft-danger"
-            >
-              <i className="icofont-trash" />
-            </div>
-            <div
-              onClick={() => {
-                var elementTest = document.getElementById("post-new");
-                elementTest.classList.add("active");
-                setStateAdd("Update");
-                setSchools([]);
-                clickToUpdate(element.id);
-              }}
-              className="button soft-primary"
-            >
-              <i className="icofont-pen-alt-1" />
-            </div>
-          </td>
-        </tr>
-      );
-    });
-  };
+};
+
+
+
+
   return (
     <div className="theme-layout">
       <div className="responsive-header">
@@ -568,7 +667,7 @@ export default function Nutrient() {
         <div className="row">
           <div className="col-lg-12">
             <div className="panel-content">
-              <h4 className="main-title">Quản Lý dinh dưỡng</h4>
+              <h4 className="main-title">Quản Lý dinh dưỡng của sản phẩm</h4>
               <button
                 className="main-btn"
                 onClick={() => {
@@ -598,11 +697,11 @@ export default function Nutrient() {
                         <tr>
                           <th>STT</th>
                           <th>Chất dinh dưỡng</th>
-                          <th></th>
+                          
                           <th>Edit</th>
                         </tr>
                       </thead>
-                      <tbody>{renderAllGroups()}</tbody>
+                      <tbody>{ product && renderProductNutrient()}</tbody>
                     </table>
                   </div>
                 </div>
@@ -871,6 +970,37 @@ export default function Nutrient() {
               className="c-form"
             >
              
+             <div
+                style={{
+                  display: "flex",
+                  marginTop: 20,
+                  alignItems: "baseline",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    width: "20%",
+                  }}
+                >
+                  Chọn thương hiệu:{" "}
+                </p>
+                <select
+                  onChange={onChangeSelect}
+                  id="txtSelectNutrient"
+                  style={{
+                    padding: 10,
+                    width: "30%",
+                    marginRight: 10,
+                  }}
+                >
+                  <option>Chọn thương hiệu</option>
+                  {stateAdd == "Create"
+                    ? renderAllNutrient()
+                    : renderAllNutrient(schoolEdit)}
+                </select>
+              </div>
               <div
                 style={{
                   display: "flex",
@@ -885,16 +1015,70 @@ export default function Nutrient() {
                     width: "20%",
                   }}
                 >
-                  Dinh dưỡng:{" "}
+                  in100g:{" "}
                 </p>
                 <input
                   required
-                  placeholder="Nhập chất dinh dưỡng"
+                  placeholder="Nhập in100g"
                   style={{
                     width: "100%",
                     padding: 10,
                   }}
-                  id="txtnutrient"
+                  id="txtin100g"
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: 20,
+                  alignItems: "baseline",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    width: "20%",
+                  }}
+                >
+                  inCup:{" "}
+                </p>
+                <input
+                  required
+                  placeholder="Nhập inCup"
+                  style={{
+                    width: "100%",
+                    padding: 10,
+                  }}
+                  id="txtincup"
+                />
+              </div>
+
+
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: 20,
+                  alignItems: "baseline",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    width: "20%",
+                  }}
+                >
+                  unit:{" "}
+                </p>
+                <input
+                  required
+                  placeholder="Nhập chất unit"
+                  style={{
+                    width: "100%",
+                    padding: 10,
+                  }}
+                  id="txtunit"
                 />
               </div>
             
