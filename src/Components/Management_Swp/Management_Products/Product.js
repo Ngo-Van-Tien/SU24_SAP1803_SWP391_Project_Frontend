@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import SideBar from "../../Sidebar/SideBar";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import Loader from "../../Loader";
 
 export default function Product() {
   const [groups, setGroups] = useState([]);
@@ -12,17 +13,45 @@ export default function Product() {
   const [groupRecent, setGroupRecent] = useState({});
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
   const [nutrientData, setNutrientData] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [brandId, setBrandId] = useState([]);
+  const [loader, setLoader] = useState(true);
+
+  const [selectedOption, setSelectedOption] = useState({});
+  const [selectedOptionsList, setSelectedOptionsList] = useState([]);
+
   const history = useHistory()
   useEffect(async () => {
     await getAllSchool();
     await getAllGroups();
     await getAllNutrient();
+    await getAllBrand()
   }, []);
+  
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+  
+
+  const handleDeleteImage = () => {
+    setSelectedFile(null);
+    URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+    document.getElementById("txtImage").value = "";
+  };
 
   const clickToUpdate = async (id) => {
-    await getGroupRecent(id);
+    await getProductRecent(id);
   };
   const changeSubmit = async (event) => {
+    setLoader(true)
     event.preventDefault();
     if (stateAdd == "Create") {
       await addGroup();
@@ -30,30 +59,24 @@ export default function Product() {
       await updateGroup();
     }
   };
+  
+
   const addGroup = async () => {
     if (document.getElementById("txtMilkBrandId").value !== "Chọn thương hiệu") {
       try {
-        console.log(document.getElementById("txtMilkBrandId").value)
+        console.log(document.getElementById("txtMilkBrandId").value);
+        
         const formData = new FormData();
         formData.append('Name', document.getElementById("txtName").value);
         formData.append('Description', document.getElementById("txtDesciption").value);
         formData.append('StartAge', document.getElementById("txtstartAge").value);
         formData.append('EndAge', document.getElementById("txtendAge").value);
         formData.append('MilkBrandId', document.getElementById("txtMilkBrandId").value);
-        // const nutrients  = nutrientsList.map(item => ({
-        //   nutrientId: item.nutrientId,
-        //   in100g: item.in100g,
-        //   inCup: item.inCup,
-        //   unit: item.unit
-        // }));
-
         
-      
         
-        // Lấy tệp hình ảnh từ input
         const imageInput = document.getElementById("txtImage");
         if (imageInput.files.length > 0) {
-          formData.append('Image', imageInput.files[0]);
+          formData.append("Image", imageInput.files[0]);
         }
         
         const response = await axios.post(
@@ -66,18 +89,27 @@ export default function Product() {
             },
           }
         );
+  
         if (response.status === 200) {
-          await getAllGroups();
+          await getAllGroups(); 
+          
           alert("Tạo sản phẩm thành công");
           setStateAdd("Create");
           
+          document.getElementById("txtMilkBrandId").value = "";
           document.getElementById("txtName").value = "";
           document.getElementById("txtDesciption").value = "";
           document.getElementById("txtstartAge").value = "";
           document.getElementById("txtendAge").value = "";
-          document.getElementById("txtImage").value = ""; // Xóa giá trị của input hình ảnh
+         
+
+          
           var elementTest = document.getElementById("post-new");
           elementTest.classList.remove("active");
+          
+          setSelectedOption({});
+          setSelectedOptionsList([]);
+          handleDeleteImage();
         }
       } catch (err) {
         console.error(err);
@@ -87,70 +119,107 @@ export default function Product() {
     }
   };
   const updateGroup = async () => {
-    if (
-      document.getElementById("txtSelectCountry").value != "Chọn trường" &&
-      document.getElementById("txtSelectSchoolYear").value != ""
-    ) {
-      let avtImg = null;
-      let bgImg = null;
-
-      for (let i = 0; i < imgNotSave.length; i++) {
-        if (imgNotSave[i].type == "avatar") {
-          avtImg = await saveImgInImgBB(imgNotSave[i].img);
-        } else {
-          bgImg = await saveImgInImgBB(imgNotSave[i].img);
-        }
-      }
-
-      if (avtImg == null) {
-        avtImg = groupRecent.avataImg;
-      }
-      if (bgImg == null) {
-        bgImg = groupRecent.backgroundImg;
-      }
+    const milkBrandId = document.getElementById("txtMilkBrandId").value;
+    if (milkBrandId !== "Chọn thương hiệu") {
       try {
-        const data = {
-          name: document.getElementById("txtName").value,
-          schoolYearId: document.getElementById("txtSelectSchoolYear").value,
-          policy: document.getElementById("txtPolicy").value,
-          backgroundImg: bgImg,
-          avataImg: avtImg,
-          description: document.getElementById("txtDesciption").value,
-          info: document.getElementById("txtInfomation").value,
-          groupAdminId:
-            groupRecent.groupAdminId != null ? groupRecent.groupAdminId : null,
-        };
-        const response = await axios.put(
-          `https://truongxuaapp.online/api/v1/groups?id=${groupRecent.id}`,
-          data,
+        const formData = new FormData();
+        formData.append("Id", groupRecent.id); 
+        formData.append("Name", document.getElementById("txtName").value);
+        formData.append("Description", document.getElementById("txtDesciption").value);
+        formData.append("StartAge", document.getElementById("txtstartAge").value);
+        formData.append("EndAge", document.getElementById("txtendAge").value);
+        formData.append("MilkBrandId", milkBrandId);
+  
+        const imageInput = document.getElementById("txtImage");
+        if (imageInput.files.length > 0) {
+          formData.append("Image", imageInput.files[0]);
+        }
+  
+        console.log("FormData values:", {
+          Id: groupRecent,
+          Name: document.getElementById("txtName").value,
+          Description: document.getElementById("txtDesciption").value,
+          StartAge: document.getElementById("txtstartAge").value,
+          EndAge: document.getElementById("txtendAge").value,
+          MilkBrandId: milkBrandId,
+          Image: imageInput.files.length > 0 ? imageInput.files[0] : null,
+        });
+  
+        const response = await axios.post(
+          "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/updateproduct",
+          formData,
           {
             headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + localStorage.authorization,
+              "Content-Type": "multipart/form-data",
+              Authorization: "Bearer " + localStorage.getItem("authorization"),
             },
           }
         );
+  
+        console.log("API response:", response);
+  
         if (response.status === 200) {
-          await getAllGroups();
-          alert("Cập nhập nhóm thành công ");
-          setImgNotSave([]);
+          await getAllGroups(); // Gọi lại hàm getAllGroups để tải lại danh sách nhóm
+          alert("Cập nhật sản phẩm thành công");
+          handleDeleteImage();
+  
           setStateAdd("Create");
           document.getElementById("txtName").value = "";
           document.getElementById("txtDesciption").value = "";
+          document.getElementById("txtstartAge").value = "";
+          document.getElementById("txtendAge").value = "";
+          document.getElementById("txtImage").value = "";
+          document.getElementById("txtMilkBrandId").value = "";
+  
           var elementTest = document.getElementById("post-new");
           elementTest.classList.remove("active");
         }
       } catch (err) {
-        console.error(err);
+        if (err.response && err.response.status === 400) {
+          alert("Dữ liệu gửi lên không hợp lệ. Vui lòng kiểm tra lại.");
+          console.error("Error details:", err.response.data);
+        } else {
+          console.error(err);
+          alert("Có lỗi xảy ra. Vui lòng thử lại sau.");
+        }
       }
     } else {
-      alert("Chọn trường và niên khóa phù hợp");
+      alert("Chọn công ty");
     }
   };
-  const getGroupRecent = async (id) => {
+  
+  
+  
+  
+  
+ 
+  const getAllBrand = async () => {
     try {
       const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/groups/${id}`,
+        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/GetAllMilkBrand",
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + localStorage.authorization,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setBrandId(response.data.data);
+        console.log(response.data.data)
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
+
+  const getProductRecent = async (id) => {
+    setLoader(false)
+    try {
+      const response = await axios.get(
+        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/getproduct?id=${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -159,59 +228,25 @@ export default function Product() {
         }
       );
       if (response.status === 200) {
-        setGroupRecent(response.data);
+        setGroupRecent(response.data)
+        setSchoolEdit(response.data.milkBrand.id)
         document.getElementById("txtName").value = response.data.name;
-        document.getElementById("txtDesciption").value =
-          response.data.description;
-        document.getElementById("txtSelectCountry").value = response.data.nation;
-        setSchoolEdit(id);
-        await getAllSchool();
+        document.getElementById("txtDesciption").value =response.data.description;
+        document.getElementById("txtstartAge").value = response.data.startAge;
+        document.getElementById("txtendAge").value = response.data.endAge;
+        setPreviewUrl(
+          `data:image/png;base64, ${response.data.image.content}`
+        );
+       
+        await getAllBrand();
+        
       }
     } catch (err) {
       console.error(err);
     }
   };
-  const getSchoolIdBySchoolYearId = async (schoolYearId) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/schools/schoolyears/${schoolYearId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        return response.data.schoolId;
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const saveImgInImgBB = async (img) => {
-    let body = new FormData();
-    body.set("key", "71b6c3846105c92074f8e9a49b85887f");
-    body.append("image", img);
-    try {
-      const response = await axios({
-        method: "POST",
-        url: "https://api.imgbb.com/1/upload",
-        data: body,
-      });
-      if (response.status == 200) {
-        console.log(response.data.data.display_url);
-        return response.data.data.display_url;
-        // dataImgSave = {
-        //   name: response.data.data.title,
-        //   url_display: response.data.data.display_url,
-        // };
-        // return dataImgSave.url_display;
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+ 
+  
 
   const getAllSchool = async () => {
     try {
@@ -226,6 +261,7 @@ export default function Product() {
       );
       if (response.status === 200) {
         setSchools(response.data.data);
+        setLoader(false);
       }
     } catch (err) {
       console.error(err);
@@ -256,11 +292,8 @@ export default function Product() {
     }
   };
 
-  const 
-  
-  
-  renderAllSchool = (selectIndex) => {
-    return schools.map((element, index) => {
+  const renderBrandId = (selectIndex) => {
+    return brandId.map((element, index) => {
       if (selectIndex == undefined) {
         return (
           <option value={element.id} key={index}>
@@ -298,32 +331,6 @@ export default function Product() {
     const [nutrientsList, setNutrientsList] = useState([]);
     
   
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFormData({ ...formData, [name]: value });
-    };
-  
-    const handleAdd = (e) => {
-      e.preventDefault()
-      const newNutrient = { ...formData };
-      const nu = nutrientData.find(opt => opt.id === formData.nutrientId)
-      newNutrient.nutrientName = nu.name
-      setNutrientsList([...nutrientsList, newNutrient]);
-      setFormData({
-        nutrientId: '', // Resetting select option
-        nutrientName: '',
-        in100g: 0,
-        inCup: 0,
-        unit: ''
-      });
-    };
-  
-    const handleDelete = (e, index) => {
-      e.preventDefault();
-      const updatedList = [...nutrientsList];
-      updatedList.splice(index, 1);
-      setNutrientsList(updatedList);
-    };
   
 
   const getAllGroups = async () => {
@@ -338,6 +345,7 @@ export default function Product() {
         }
       );
       if (response.status === 200) {
+        setLoader(false)
         console.log(response.data.data)
         setGroups(response.data.data);
       }
@@ -345,26 +353,7 @@ export default function Product() {
       console.error(err);
     }
   };
-  const getImageByPostId = async (postId) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/images/postid?postId=${postId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        for (let i = 0; i < response.data.length; i++) {
-          await deleteImageInPost(response.data[i].id);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  
   const deleteImageInPost = async (idImage) => {
     try {
       const response = await axios.delete(
@@ -380,6 +369,7 @@ export default function Product() {
       console.error(err);
     }
   };
+
   const getCommentByPostId = async (postId) => {
     try {
       const response = await axios.get(
@@ -415,52 +405,44 @@ export default function Product() {
       console.error(err);
     }
   };
-  const findPostByGroupId = async (groupId) => {
+  
+  const deleteAGroup = async (idGroup) => {
     try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/posts/groupid?groupId=${groupId}`,
+      console.log('idGroup:', idGroup);
+      const formData = new FormData();
+      formData.append('Id', idGroup);
+
+      const response = await axios.delete(
+
+        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/Delete`,
+
         {
+          data: formData,
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
             Authorization: "Bearer " + localStorage.authorization,
           },
         }
       );
       if (response.status === 200) {
-        for (let i = 0; i < response.data.length; i++) {
-          getImageByPostId(response.data[i].id);
-          getCommentByPostId(response.data[i].id);
-        }
-      }
-    } catch (err) {
-      console.err(err);
-    }
-  };
-  const deleteAGroup = async (idGroup) => {
-    try {
-      const formData = new FormData();
-      formData.append('Id', idGroup);
-  
-      const response = await axios.request({
-        method: 'DELETE',
-        url: 'http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/Delete',
-        headers: {
-          'accept': '*/*',
-          'Authorization': 'Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhZG1pbkBlbWFpbC5jb20iLCJzdWIiOiIzYWM1OWMyMy03ZWM0LTRkMzItYTIyNC02OGRmZDk5ODBmZTAiLCJlbWFpbCI6ImFkbWluQGVtYWlsLmNvbSIsIkZpcnN0TmFtZSI6ImFkbWluIiwiTGFzdE5hbWUiOiJhZG1pbiIsIlBob25lTnVtYmVyIjoiKzExMTExMTExMTExMSIsIkFkZHJlc3MiOiJMb2NhdGlvbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzIwODQ2NzAwLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo1MTA2IiwiYXVkIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NTEwNiJ9.iDgnWoB2ckcAnTGB6NinLpmVK8OisIUhFvR_O5PPSnM',
-          'Content-Type': 'multipart/form-data'
-        },
-        data: formData
-      });
-  
-      if (response.status === 200) {
         document.getElementById("delete-post").classList.remove("active");
-        alert("Xóa thành công thương hiệu");
+        alert("Xóa sản phẩm thành công");
         await getAllGroups();
       }
     } catch (err) {
-      console.log(err);
+      console.error(err); 
+      if (err.response) {
+        console.error('Response data:', err.response.data);
+        console.error('Response status:', err.response.status);
+        console.error('Response headers:', err.response.headers);
+      } else if (err.request) {
+        console.error('Request data:', err.request);
+      } else {
+        console.error('Error message:', err.message);
+      }
     }
   };
+
   
   
  
@@ -477,6 +459,7 @@ export default function Product() {
           <td>{element.endAge}</td>
           <td>{element.milkBrand.name}</td>
           <td>
+          {" "}
             {element.image && (
               <img
                 src={`data:image/png;base64, ${element.image.content}`}
@@ -490,6 +473,7 @@ export default function Product() {
 
             <div
               onClick={() => {
+                
                 var elementTest = document.getElementById("delete-post");
                 elementTest.classList.add("active");
                 setDeleteGroupId(element.id);
@@ -505,6 +489,7 @@ export default function Product() {
             
             <div
               onClick={() => {
+                setLoader(true)
                 var elementTest = document.getElementById("post-new");
                 elementTest.classList.add("active");
                 setStateAdd("Update");
@@ -530,6 +515,7 @@ export default function Product() {
   };
   return (
     <div className="theme-layout">
+      {loader && <Loader />}
       <div className="responsive-header">
         <div className="res-logo">
           <img src="images/logo.png" alt="" />
@@ -923,7 +909,7 @@ export default function Product() {
                           <th>Tuổi kết thúc</th>
                           <th>Thương Hiệu Sữa</th>
                           <th>Hình Anh</th>
-                          <th>Edit</th>
+                          <th>Chỉnh sửa</th>
                         </tr>
                       </thead>
                       <tbody>{renderAllGroups()}</tbody>
@@ -931,15 +917,7 @@ export default function Product() {
                   </div>
                 </div>
               </div>
-              <div className="row merged20 mb-4">
-                <div className="col-lg-6">
-                  <div className="d-widget">
-
-
-                  </div>
-                </div>
-
-              </div>
+             
 
             </div>
           </div>
@@ -1146,9 +1124,15 @@ export default function Product() {
               var element = document.getElementById("post-new");
               element.classList.remove("active");
               setStateAdd("Create");
+              document.getElementById("txtMilkBrandId").value = "";
               document.getElementById("txtName").value = "";
               document.getElementById("txtDesciption").value = "";
-              //setElementUpdate(undefined);
+              document.getElementById("txtstartAge").value = "";
+              document.getElementById("txtendAge").value = "";
+              setSelectedOption({});
+              setSelectedOptionsList([]);
+              handleDeleteImage();
+
             }}
             className="popup-closed"
           >
@@ -1185,7 +1169,7 @@ export default function Product() {
                   }}
                   id="popup-head-name"
                 >
-                  Tạo Sản Phẩm
+                  {stateAdd == "Create" ? "Tạo thương hiệu" : "Cập nhật thương hiệu"}
                 </p>
               </h5>
             </div>
@@ -1221,8 +1205,8 @@ export default function Product() {
                 >
                   <option>Chọn thương hiệu</option>
                   {stateAdd == "Create"
-                    ? renderAllSchool()
-                    : renderAllSchool(schoolEdit)}
+                    ? renderBrandId()
+                    : renderBrandId(schoolEdit)}
                 </select>
               </div>
               <div
@@ -1308,70 +1292,35 @@ export default function Product() {
                   id="txtImage"
                   onChange={(e) => {
                     const file = e.target.files[0];
+                    handleFileChange(e);
                     // Xử lý tệp hình ảnh ở đây
                   }}
                 />
               </div>
 
-              <div>
-      {/* <h3>Add Nutrient Data</h3> */}
-      {/* <div>
-        <label>Nutrient ID:</label>
-        <select
-          name="nutrientId"
-          value={formData.nutrientId}
-          onChange={handleChange}
-        >
-          <option value="">Select Nutrient ID</option>
-          {nutrientData.map(nutrient => (
-            <option key={nutrient.id} value={nutrient.id}>{nutrient.name}</option>
-          ))}
-        </select>
-      </div> */}
-      {/* <div>
-        <label>In 100g:</label>
-        <input
-          type="number"
-          name="in100g"
-          value={formData.in100g}
-          onChange={handleChange}
-        />
-      </div> */}
-      {/* <div>
-        <label>In Cup:</label>
-        <input
-          type="number"
-          name="inCup"
-          value={formData.inCup}
-          onChange={handleChange}
-        />
-      </div> */}
-      {/* <div>
-        <label>Unit:</label>
-        <input
-          type="text"
-          name="unit"
-          value={formData.unit}
-          onChange={handleChange}
-        />
-      </div> */}
-      {/* <button onClick={handleAdd}>Add</button> */}
-
-      {/* Display added nutrients */}
-      {/* <div>
-        <h4>Added Nutrients:</h4>
-        <ul>
-          {nutrientsList.map((nutrient, index) => (
-            <li key={index}>
-              Nutrient name: { nutrient.nutrientName}, In 100g: {nutrient.in100g}, In Cup: {nutrient.inCup}, Unit: {nutrient.unit}
-              <button onClick={(e) => handleDelete(e, index)}>Delete</button>
-            </li>
-          ))}
-        </ul>
-      </div> */}
-    </div>
-
-
+              <div className="page-break"></div>
+              {previewUrl && (
+                <div style={{ position: "relative" }}>
+                  {stateAdd == "Create" && (
+                    <button
+                      style={{
+                        position: "absolute",
+                        top: "5px",
+                        left: "200px",
+                        zIndex: "10",
+                      }}
+                      onClick={handleDeleteImage}
+                    >
+                      X
+                    </button>
+                  )}
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    style={{ maxWidth: "200px", maxHeight: "150px" }}
+                  />
+                </div>
+              )}
 
               <button
                 className="main-btn"
@@ -1386,7 +1335,7 @@ export default function Product() {
                   marginRight: "auto",
                 }}
               >
-                Tạo Sản Phẩm
+                {stateAdd == "Create" ? "Tạo thương hiệu" : "Cập nhật thương hiệu"}
               </button>
             </form>
           </div>

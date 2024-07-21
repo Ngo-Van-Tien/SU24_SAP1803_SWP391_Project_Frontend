@@ -4,7 +4,6 @@
 $(window).on('load', function () {
 	"use strict";
     /*$(".se-pre-con").fadeOut("slow");*/
-	$('#page-loader').addClass('hidden');
 	
 //animated svg icons
 	var settings = $.extend({

@@ -459,7 +459,7 @@ export default function General() {
                 </i>
               </div>
               <div className="page-title">
-                <h4>All Orderdetail</h4>
+                <h4>All General.</h4>
               </div>
             </div>
             <div className="col-lg-6 col-md-6 col-sm-6">
@@ -471,7 +471,7 @@ export default function General() {
                 </li>
                 <li>
                   <a href="#" title>
-                    All Orderdetail
+                    All General
                   </a>
                 </li>
               </ul>

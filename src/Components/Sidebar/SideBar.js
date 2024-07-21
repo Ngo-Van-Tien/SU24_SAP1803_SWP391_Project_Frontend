@@ -9,6 +9,9 @@ export default function SideBar() {
     <div>
       <nav className="sidebar">
         <ul className="menu-slide">
+
+
+
           <li
             onClick={() => {
               let element = document.getElementById(activeId);
@@ -19,8 +22,13 @@ export default function SideBar() {
             id="txtSchool"
             className
           >
-            <Link to="/school">
-              <a
+            
+
+
+
+            
+            <Link to="/general">
+              <a  
                 className
                 style={{
                   cursor: "pointer",
@@ -47,10 +55,11 @@ export default function SideBar() {
                     <line x1={15} y1={9} x2="15.01" y2={9} />
                   </svg>
                 </i>
-                Quản lý kho sữa
+                Báo Cáo
               </a>
             </Link>
           </li>
+
           <li
             onClick={() => {
               let element = document.getElementById(activeId);
@@ -60,7 +69,13 @@ export default function SideBar() {
             }}
             id="txtGroup"
           >
-            <Link to="/group">
+
+
+
+
+
+
+            <Link to="/product">
               <a
                 classNamestyle={{
                   cursor: "pointer",
@@ -85,7 +100,7 @@ export default function SideBar() {
                     <polygon points="12 15 17 21 7 21 12 15" />
                   </svg>
                 </i>
-                Quản lý công ty
+                Hệ Thống Sữa Gốc
               </a>
             </Link>
           </li>
@@ -98,7 +113,10 @@ export default function SideBar() {
             }}
             id="txtGroup"
           >
-            <Link to="/brand">
+
+
+
+            <Link to="/school">
               <a
                 classNamestyle={{
                   cursor: "pointer",
@@ -123,10 +141,13 @@ export default function SideBar() {
                     <polygon points="12 15 17 21 7 21 12 15" />
                   </svg>
                 </i>
-                Quản lý thương hiệu
+                Dòng Sữa
               </a>
             </Link>
+
           </li>
+          
+          
           <li
             onClick={() => {
               let element = document.getElementById(activeId);
@@ -167,7 +188,10 @@ export default function SideBar() {
               </a>
             </Link> */}
 
-            <Link to="/milkfuncion">
+
+            
+
+            <Link to="/order">
               <a
                 classNamestyle={{
                   cursor: "pointer",
@@ -193,11 +217,13 @@ export default function SideBar() {
                     <path d="M16 10a4 4 0 0 1-8 0" />
                   </svg>
                 </i>
-                Quản lý Chức năng sữa
+                Đơn Hàng
               </a>
             </Link>
 
           </li>
+
+          <hr />
           <li
             onClick={() => {
               let element = document.getElementById(activeId);
@@ -208,7 +234,7 @@ export default function SideBar() {
             id="txtAccount"
             className
           >
-            <Link to="/Account">
+            <Link to="/brand">
               <a
                 className
                 style={{
@@ -236,7 +262,7 @@ export default function SideBar() {
                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                   </svg>
                 </i>
-                Quản lý Tài Khoản
+                Thương Hiệu
               </a>
             </Link>
           </li>
@@ -253,6 +279,55 @@ export default function SideBar() {
           >
            
 
+            <Link to="/milkfuncion">
+              <a
+                classNamestyle={{
+                  cursor: "pointer",
+                }}
+                title
+              >
+                <i className>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={14}
+                    height={14}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="feather feather-coffee"
+                  >
+                    <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                    <line x1={6} y1={1} x2={6} y2={4} />
+                    <line x1={10} y1={1} x2={10} y2={4} />
+                    <line x1={14} y1={1} x2={14} y2={4} />
+                  </svg>
+                </i>
+                Chức Năng Sữa
+
+              </a>
+            </Link>
+
+          </li>
+          
+
+
+
+
+          
+          <li
+            onClick={() => {
+              let element = document.getElementById(activeId);
+              element.classList.remove("active");
+              document.getElementById("txtNews").classList.add("active");
+              setActiveId("txtNews");
+            }}
+            id="txtNews"
+            className
+          >
             <Link to="/nutrient">
               <a
                 classNamestyle={{
@@ -280,23 +355,42 @@ export default function SideBar() {
                     <line x1={14} y1={1} x2={14} y2={4} />
                   </svg>
                 </i>
-                Quản lý chất dinh dưỡng
+                Dinh Dưỡng
+              </a>
+            </Link>
+            <Link to="/group">
+              <a
+                classNamestyle={{
+                  cursor: "pointer",
+                }}
+                title
+              >
+                <i className>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={14}
+                    height={14}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="feather feather-coffee"
+                  >
+                    <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                    <line x1={6} y1={1} x2={6} y2={4} />
+                    <line x1={10} y1={1} x2={10} y2={4} />
+                    <line x1={14} y1={1} x2={14} y2={4} />
+                  </svg>
+                </i>
+                Công Ty
               </a>
             </Link>
 
-          </li>
-          
-          <li
-            onClick={() => {
-              let element = document.getElementById(activeId);
-              element.classList.remove("active");
-              document.getElementById("txtNews").classList.add("active");
-              setActiveId("txtNews");
-            }}
-            id="txtNews"
-            className
-          >
-            <Link to="/product">
+            
+            <Link to="/Account">
               <a
                 classNamestyle={{
                   cursor: "pointer",
@@ -323,67 +417,7 @@ export default function SideBar() {
                     <line x1={14} y1={1} x2={14} y2={4} />
                   </svg>
                 </i>
-                Quản lý sản phẩm
-              </a>
-            </Link>
-            <Link to="/order">
-              <a
-                classNamestyle={{
-                  cursor: "pointer",
-                }}
-                title
-              >
-                <i className>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width={14}
-                    height={14}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="feather feather-coffee"
-                  >
-                    <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
-                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
-                    <line x1={6} y1={1} x2={6} y2={4} />
-                    <line x1={10} y1={1} x2={10} y2={4} />
-                    <line x1={14} y1={1} x2={14} y2={4} />
-                  </svg>
-                </i>
-                Đơn hàng
-              </a>
-            </Link>
-            <Link to="/general">
-              <a
-                classNamestyle={{
-                  cursor: "pointer",
-                }}
-                title
-              >
-                <i className>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width={14}
-                    height={14}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="feather feather-coffee"
-                  >
-                    <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
-                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
-                    <line x1={6} y1={1} x2={6} y2={4} />
-                    <line x1={10} y1={1} x2={10} y2={4} />
-                    <line x1={14} y1={1} x2={14} y2={4} />
-                  </svg>
-                </i>
-                Báo cáo doanh số
+                Tài Khoản
               </a>
             </Link>
             

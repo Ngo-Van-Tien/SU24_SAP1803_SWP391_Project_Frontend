@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import SideBar from "../../Sidebar/SideBar";
 import { Country } from "../../Country";
+import Loader from "../../Loader";
 
 export default function Group() {
   const [groups, setGroups] = useState([]);
@@ -13,7 +14,7 @@ export default function Group() {
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
   const [pageIndex, setPageIndex] = useState(1);
   const pageSize = 20;
-  
+  const [loader, setLoader] = useState(true);
 
 
   useEffect(() => {
@@ -262,13 +263,14 @@ export default function Group() {
         formData,
         {
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
             Authorization: "Bearer " + localStorage.authorization,
           },
         }
       );
       if (response.status === 200) {
         setGroups(response.data.data);
+        setLoader(false)
       }
     } catch (err) {
       console.error(err);
@@ -354,27 +356,7 @@ export default function Group() {
       console.error(err);
     }
   };
-  const findPostByGroupId = async (groupId) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/posts/groupid?groupId=${groupId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        for (let i = 0; i < response.data.length; i++) {
-          getImageByPostId(response.data[i].id);
-          getCommentByPostId(response.data[i].id);
-        }
-      }
-    } catch (err) {
-      console.err(err);
-    }
-  };
+
   const deleteAGroup = async (idGroup) => {
     try {
       const response = await axios.delete(
@@ -393,11 +375,11 @@ export default function Group() {
     return groups.map((element, index) => {
       return (
         <tr key={index}>
-          <td>{element.id}</td>
+          <td>{index+1}</td>
           <td>{element.email}</td>
           <td>{element.lastName}</td>
           <td>{element.address}</td>
-          <td>{element.phoneNumber}</td>
+          <td>{element.status}</td>
           <td>
             <div
               onClick={() => {
@@ -431,6 +413,7 @@ export default function Group() {
   };
   return (
     <div className="theme-layout">
+      {loader && <Loader />}
       <div className="responsive-header">
         <div className="res-logo">
           <img src="images/logo.png" alt="" />
@@ -762,7 +745,7 @@ export default function Group() {
                 </i>
               </div>
               <div className="page-title">
-                <h4>All Events</h4>
+                <h4>All Account.</h4>
               </div>
             </div>
             <div className="col-lg-6 col-md-6 col-sm-6">
@@ -774,7 +757,7 @@ export default function Group() {
                 </li>
                 <li>
                   <a href="#" title>
-                    All Events
+                    All Account
                   </a>
                 </li>
               </ul>
@@ -789,7 +772,7 @@ export default function Group() {
         <div className="row">
           <div className="col-lg-12">
             <div className="panel-content">
-              <h4 className="main-title">Quản lý công ty</h4>
+              <h4 className="main-title">Quản lý người dùng</h4>
               <button
                 className="main-btn"
                 onClick={() => {
@@ -835,17 +818,17 @@ export default function Group() {
       <div className="col-lg-12">
         <div className="d-widget">
           <div className="d-widget-title">
-            <h5>Tất cả các công ty</h5>
+            <h5>Danh sách người dùng</h5>
           </div>
           <table className="table table-default all-events table-striped table-responsive-lg">
             <thead>
               <tr>
-                <th>ID#</th>
-                <th>email</th>
+                <th>STT</th>
+                <th>Email</th>
                 <th>Tên</th>
                 <th>Sđt</th>
                 <th>Trạng Thái</th>
-                <th>Edit</th>
+                <th>Chỉnh sửa</th>
               </tr>
             </thead>
             <tbody>{renderAllGroups()}</tbody>

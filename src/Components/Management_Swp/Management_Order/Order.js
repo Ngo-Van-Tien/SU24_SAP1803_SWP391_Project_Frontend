@@ -30,62 +30,30 @@ export default function Order() {
   };
   const changeSubmit = async (event) => {
     event.preventDefault();
-    if (stateAdd == "Create") {
-      await addGroup();
-    } else {
+    if (stateAdd == "Update") {
       await updateGroup();
-    }
-  };
-  const addGroup = async () => {
-    if (
-      document.getElementById("txtSelectCountry").value != "Chọn công ty"
-    ) {
-      try {
-        const ids = selectedOptionsList.map(option => option.id);
-        const formData = new FormData();
-        formData.append('Name', document.getElementById("txtName").value);
-        formData.append('CompanyId', document.getElementById("txtSelectCountry").value);
-        selectedOptionsList.forEach((item, index) => {
-          formData.append('MilkFunctionIds', item.id);
-      });
-        
-        const response = await axios.post(
-          "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/AddMilkBrand",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: "Bearer " + localStorage.authorization,
-
-            },
-          }
-        );
-        if (response.status === 200) {
-          await getAllOrder();
-          alert("Tạo thương hiệu thành công");
-          setStateAdd("Create");
-          var elementTest = document.getElementById("post-new");
-          elementTest.classList.remove("active");
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    } else {
-      alert("Có lỗi rồi");
     }
   };
   const updateGroup = async () => {
     if (
-      document.getElementById("txtOrderStatus").value != "" &&
-      document.getElementById("txtSelectPayment").value != ""
+      document.getElementById("txtOrderStatus").value != ""
     ) {
       try {
+        let statusUpdate = document.getElementById("txtOrderStatus").value;
         const formData = new FormData();
         formData.append('Id', schoolEdit);
-        formData.append('Status', document.getElementById("txtOrderStatus").value);
-        formData.append('StatusPayment', document.getElementById("txtSelectPayment").value);
+        if(statusUpdate != "CANCEL"){
+          formData.append('Status', statusUpdate);
+          formData.append('StatusPayment', statusUpdate == "DELIVERED" ? "PAID" : groupRecent.statusPayment);
+        }
+        else if(statusUpdate == "CANCEL" && groupRecent.status =="CANCEL"){
+          formData.append('Status', statusUpdate);
+          formData.append('StatusPayment', document.getElementById("txtSelectPayment").value);
+        }
         const response = await axios.post(
-          `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Order/updatestatus`,
+          `${(statusUpdate == "CANCEL" && groupRecent.status !="CANCEL")
+             ? "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Order/cancelorder"
+              : "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Order/updatestatus"}`,
           formData,
           {
             headers: {
@@ -120,10 +88,12 @@ export default function Order() {
         }
       );
       if (response.status === 200) {
-        console.log(response.data)
         setGroupRecent(response.data);
         document.getElementById("txtOrderStatus").value = response.data.status;
-        document.getElementById("txtSelectPayment").value = response.data.statusPayment;
+        if(response.data.status == "CANCEL"){
+          document.getElementById("txtSelectPayment").value = response.data.statusPayment;
+
+        }
         setSchoolEdit(id);
       }
     } catch (err) {
@@ -132,29 +102,7 @@ export default function Order() {
     }
   };
 
-  const getAllOrdder = async () => {
-    try {
-      const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkFunction/GetAll",
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        setMilkFunction(response.data.data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const [selectedOption, setSelectedOption] = useState({});
-  const [milkFunction, setMilkFunction] = useState();
-
-    const [selectedOptionsList, setSelectedOptionsList] = useState([]);
 
   const onChangeSelect = async (event) => {
   };
@@ -177,34 +125,6 @@ export default function Order() {
     }
   };
 
-  const [brandFunction, setBrandFuction] = useState()
-  const [brandFunctions, setBrandFuctions] = useState([])
-  const deleteFunction = (index) => {
-    const updatedFunctions = [...brandFunctions];
-    updatedFunctions.splice(index, 1);
-    setBrandFuctions(updatedFunctions);
-  };
-
-  const deleteAGroup = async (idGroup) => {
-    try {
-      const response = await axios.delete(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/DeleteMilkBrand?id=${idGroup}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        document.getElementById("delete-post").classList.remove("active");
-        alert("Xóa thành công nhóm");
-        await getAllOrdder();
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
   const renderAllOrder = () => {
     return groups.map((element, index) => {
       return (
@@ -217,20 +137,8 @@ export default function Order() {
 
           <td className="text-success">{element.description}</td>
           <td>
-            <div
-              onClick={() => {
-                var elementTest = document.getElementById("delete-post");
-                elementTest.classList.add("active");
-                setDeleteGroupId(element.id);
-              }}
-              style={{
-                marginBottom: 10,
-              }}
-              className="button soft-danger"
-            >
-              <i className="icofont-trash" />
-            </div>
-            {element.status != "DELIVERED" && <div
+            {( (element.status == "CANCEL" && element.statusPayment != "REFUNDED" )
+             || (element.status != "DELIVERED" && element.status != "CANCEL") ) &&<div
               onClick={() => {
                 var elementTest = document.getElementById("post-new");
                 elementTest.classList.add("active");
@@ -652,7 +560,7 @@ export default function Order() {
                           <th>Địa chỉ</th>
                           <th>Ngày tạo</th>
                           <th> </th>
-                          <th>Edit</th>
+                          <th>Chỉnh sửa</th>
                           {/* <button className="btn btn-primary" onClick={onClick}>
                             View
                           </button> */}
@@ -871,7 +779,6 @@ export default function Order() {
               element.classList.remove("active");
               setStateAdd("Create");
               setSelectedOption({});
-              setSelectedOptionsList([])
               //setElementUpdate(undefined);
             }}
             className="popup-closed"
@@ -943,10 +850,9 @@ export default function Order() {
                     marginRight: 10,
                   }}
                 >
-                  <option>Chọn trạng thái đơn hàng</option>
-                  <option value="PROCESSING">Chờ xác nhận</option>
+                  {groupRecent.status != "CANCEL" && <><option value="PROCESSING">Chờ xác nhận</option>
                   <option value="DELIVERING">Đang giao hàng</option>
-                  <option value="DELIVERED">Đã giao hàng</option>
+                  <option value="DELIVERED">Đã giao hàng</option></>}
                   <option value="CANCEL">Hủy</option>
                 </select>
               </div>
@@ -954,7 +860,7 @@ export default function Order() {
 
 
 
-
+{(groupRecent.status == "CANCEL") &&
               <div
                 style={{
                   display: "flex",
@@ -980,37 +886,15 @@ export default function Order() {
                     marginRight: 10,
                   }}
                 >
-                  <option>Chọn trạng thái thanh toán</option>
-                  <option value="PAID">Đã thanh toán</option>
-                  <option value="UNPAID">Chưa thanh toán</option>
+                  {/* <option value="PAID">Đã thanh toán</option>
+                  <option value="UNPAID">Chưa thanh toán</option> */}
                   <option value="REFUNDED">Đã hoàn tiền</option>
                   <option value="WAIT REFUNDED">Đợi hoàn tiền</option>
                 </select>
               </div>
+              }
               <div  >
             <ul>
-        {brandFunctions.map((func, index) => (
-          <li key={index}>
-            {func}
-            <button onClick={() => deleteFunction(index)}>
-              {/* Icon Delete using Unicode or SVG */}
-              <svg
-                onClick={() => deleteFunction(index)}
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                className="bi bi-x"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10.354 5.354a.5.5 0 0 1 0 .708L8.707 8l1.647 1.646a.5.5 0 0 1-.708.708L8 8.707 6.354 10.354a.5.5 0 0 1-.708-.708L7.293 8 5.646 6.354a.5.5 0 0 1 .708-.708L8 7.293l1.646-1.647a.5.5 0 0 1 .708 0z"
-                />
-              </svg>
-            </button>
-          </li>
-        ))}
       </ul>
     </div>
               <button
@@ -1029,71 +913,6 @@ export default function Order() {
                 Cập nhật
               </button>
             </form>
-          </div>
-        </div>
-      </div>
-      <div id="delete-post" className="post-new-popup">
-        <div className="popup" style={{ width: "800px" }}>
-          <span
-            onClick={() => {
-              var element = document.getElementById("delete-post");
-              element.classList.remove("active");
-            }}
-            className="popup-closed"
-          >
-            <i className="icofont-close" />
-          </span>
-          <div className="popup-meta">
-            <div className="popup-head">
-              <h5>
-                <p
-                  style={{
-                    fontSize: 18,
-                  }}
-                  id="popup-head-name"
-                >
-                  Bạn có chắn muốn xóa thương hiệu này ?
-                </p>
-              </h5>
-            </div>
-            <div className="post-new">
-              <button
-                style={{
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  paddingRight: 20,
-                  paddingLeft: 20,
-
-                  borderWidth: 1,
-                  borderStyle: "solid",
-                  borderColor: "#EFEFEF",
-                  float: "right",
-                  marginLeft: 10,
-                }}
-                onClick={() => {
-                  var element = document.getElementById("delete-post");
-                  element.classList.remove("active");
-                }}
-              >
-                Hủy
-              </button>
-              <button
-                style={{
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  paddingRight: 20,
-                  paddingLeft: 20,
-                  borderWidth: 1,
-                  borderStyle: "solid",
-                  borderColor: "red",
-                  backgroundColor: "red",
-                  float: "right",
-                }}
-                onClick={() => deleteAGroup(deleteGroupId)}
-              >
-                Xóa
-              </button>
-            </div>
           </div>
         </div>
       </div>

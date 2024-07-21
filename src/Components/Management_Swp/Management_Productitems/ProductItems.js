@@ -4,9 +4,11 @@ import SideBar from "../../Sidebar/SideBar";
 
 export default function Schools() {
   const [school, setSchools] = useState([]);
+  const [quanlity, setQuanlity] = useState(null);
+  const [OutOfStock, setOutOfStock] = useState(null);
   const [stateAdd, setStateAdd] = useState("Create");
   const [schoolRecent, setSchoolRecent] = useState([]);
-  const [imgNotSave, setImgNotSave] = useState({});
+
   const [schoolEdit, setSchoolEdit] = useState(-1);
   const [product, setProduct] = useState([]);
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
@@ -15,6 +17,8 @@ export default function Schools() {
   useEffect(async () => {
     await getAllSchool();
     await getallProduct();
+    await getQuanlityCompany();
+    await getQuanlityOutofstock();
     console.log(localStorage.authorization)
 
   }, []);
@@ -34,9 +38,9 @@ export default function Schools() {
         formData.append('Quantity', document.getElementById("txtQuantity").value);
         formData.append('Price', document.getElementById("txtPrice").value);
         formData.append('Size', document.getElementById("txtSize").value);
-        
-        
-        
+
+
+
         const response = await axios.post(
           "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/ProductItem/add",
           formData,
@@ -51,12 +55,12 @@ export default function Schools() {
           await getAllSchool();
           alert("Tạo sản phẩm thành công");
           setStateAdd("Create");
-          
+
           document.getElementById("txtProductId").value = "";
           document.getElementById("txtQuantity").value = "";
           document.getElementById("txtPrice").value = "";
           document.getElementById("txtSize").value = "";
-         
+
           var elementTest = document.getElementById("post-new");
           elementTest.classList.remove("active");
         }
@@ -87,10 +91,57 @@ export default function Schools() {
       console.error(err);
     }
   };
+  const getQuanlityCompany = async () => {
+    try {
+      const response = await axios.get(
+        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/GetQuantity",
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.authorization,
+          },
+        }
+      );
+      if (response.status === 200 && response.data.isSuccess) {
+        setQuanlity(response.data.quantity); // Update state with quantity from API response
+      } else {
+        console.error(response.data.errorMessage || "An error occurred");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
+
+  const getQuanlityOutofstock = async () => {
+    try {
+      const response = await axios.post(
+        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/ProductItem/GetQuantityOutOfStock",
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.authorization,
+          },
+        }
+      );
+      if (response.status === 200 && response.data.isSuccess) {
+        setOutOfStock(response.data.quantity); // Update state with quantity from API response
+      } else {
+        console.error(response.data.errorMessage || "An error occurred");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
+
+
   const clickToUpdate = async (id) => {
     await getProductitemRecent(id);
   };
-  
+
+
+
   const getProductitemRecent = async (id) => {
     try {
       const response = await axios.get(
@@ -104,19 +155,20 @@ export default function Schools() {
       );
       if (response.status === 200) {
         setSchoolRecent(response.data);
-        
-        
+
+
         document.getElementById("txtQuantity").value = response.data.quantity;
-        document.getElementById("txtPrice").value =response.data.price;
+        document.getElementById("txtPrice").value = response.data.price;
         document.getElementById("txtSize").value = response.data.size;
         setSchoolEdit(response.data.product.id);
-     
+
       }
     } catch (err) {
       console.error(err);
     }
   };
-  
+
+
   const getallProduct = async () => {
     try {
       const response = await axios.get(
@@ -138,8 +190,9 @@ export default function Schools() {
 
   const onChangeSelect = async (event) => {
   };
+
   const renderAllProduct = (selectIndex) => {
-    
+
     return product.map((element, index) => {
       if (selectIndex == undefined) {
         return (
@@ -150,7 +203,7 @@ export default function Schools() {
       } else {
         if (selectIndex == element.id) {
           return (
-            <option value={element.id} key={index} selected = {true}>
+            <option value={element.id} key={index} selected={true}>
               {element.name}
             </option>
           );
@@ -164,42 +217,7 @@ export default function Schools() {
       }
     });
   };
-  // const updateSchool = async () => {
-   
-  //   try {
-  //     const formData = new FormData();
-  //     formData.append('Id', schoolEdit);
-  //     formData.append('ProductId', document.getElementById("txtProductId").value); 
-  //     formData.append('Quantity', document.getElementById("txtQuantity").value); 
-  //     formData.append('Price', document.getElementById("txtPrice").value); 
-  //     formData.append('Size', document.getElementById("txtSize").value); 
 
-  //     const response = await axios.put(
-  //       `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/ProductItem/update`,
-  //       formData,
-  //       {
-  //         headers: {
-  //           "Content-Type": "multipart/form-data"
-  //         },
-  //       }
-  //     );
-  //     if (response.status === 200) {
-  //       await getAllSchool();
-  //         alert("Cập nhập chất dinh dưỡng thành công ");
-  //         setStateAdd("Create");
-  //       document.getElementById("txtProductId").value = "";
-  //       document.getElementById("txtQuantity").value = "";
-  //       document.getElementById("txtPrice").value = "";
-  //       document.getElementById("txtSize").value = "";
-       
-        
-  //       var elementTest = document.getElementById("post-new");
-  //       elementTest.classList.remove("active");
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
   const updateSchool = async () => {
     try {
       const formData = new FormData();
@@ -208,12 +226,12 @@ export default function Schools() {
       formData.append('Quantity', document.getElementById("txtQuantity").value);
       formData.append('Price', document.getElementById("txtPrice").value);
       formData.append('Size', document.getElementById("txtSize").value);
-  
+
       // Kiểm tra dữ liệu FormData
       for (let [key, value] of formData.entries()) {
         console.log(key, value);
       }
-  
+
       const response = await axios.put(
         `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/ProductItem/update`,
         formData,
@@ -224,16 +242,16 @@ export default function Schools() {
           },
         }
       );
-  
+
       if (response.status === 200) {
         await getAllSchool();
-        alert("Cập nhật sản phẩm thành công");
+        alert("Cập nhật dòng sữa thành công");
         setStateAdd("Create");
         document.getElementById("txtProductId").value = "";
         document.getElementById("txtQuantity").value = "";
         document.getElementById("txtPrice").value = "";
         document.getElementById("txtSize").value = "";
-  
+
         var elementTest = document.getElementById("post-new");
         elementTest.classList.remove("active");
       }
@@ -253,31 +271,20 @@ export default function Schools() {
       }
     }
   };
-  // const deleteAGroup = async (idGroup) => {
-  //   try {
-  //     const response = await axios.delete(
-  //       `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/ProductItem/delete?id=${idGroup}`
-  //     );
-  //     if (response.status === 200) {
-  //       document.getElementById("delete-post").classList.remove("active");
-  //       alert("Xóa sản phẩm thành công");
-  //       await getAllSchool();
-  //     }
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
+
+
+
 
   const deleteAGroup = async (idGroup) => {
     try {
-      console.log('idGroup:', idGroup); 
+      console.log('idGroup:', idGroup);
       const formData = new FormData();
       formData.append('Id', idGroup);
-  
+
       const response = await axios.delete(
-        
+
         `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/ProductItem/delete`,
-        
+
         {
           data: formData,
           headers: {
@@ -292,7 +299,7 @@ export default function Schools() {
         await getAllSchool();
       }
     } catch (err) {
-      console.error(err); // Sử dụng console.error để log lỗi chi tiết hơn
+      console.error(err); 
       if (err.response) {
         console.error('Response data:', err.response.data);
         console.error('Response status:', err.response.status);
@@ -304,12 +311,12 @@ export default function Schools() {
       }
     }
   };
-  
+
   const renderSchools = () => {
     return school.map((element, index) => {
       return (
         <tr key={index}>
-          <td>{index}</td>
+          <td>{element.id}</td>
           <td>{element.product.name}</td>
           <td>{element.quantity}</td>
           <td>{element.price}</td>
@@ -691,7 +698,7 @@ export default function Schools() {
                 </i>
               </div>
               <div className="page-title">
-                <h4>Danh Mục</h4>
+                <h4>All ProductItems.</h4>
               </div>
             </div>
             <div className="col-lg-6 col-md-6 col-sm-6">
@@ -718,9 +725,9 @@ export default function Schools() {
         <div className="row">
           <div className="col-lg-12">
             <div className="panel-content">
-              <h4 className="main-title">Quản lý kho sữa</h4>
+              <h4 className="main-title">Quản lý Dòng Sữa</h4>
               <div className="row merged20 mb-4">
-                <div className="col-lg-3 col-md-6">
+                {/* <div className="col-lg-3 col-md-6">
                   <div className="d-widget">
                     <div className="event-stat">
                       <i>
@@ -755,8 +762,8 @@ export default function Schools() {
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="col-lg-3 col-md-6 ">
+                </div> */}
+                {/* <div className="col-lg-3 col-md-6 ">
                   <div className="d-widget">
                     <div className="event-stat">
                       <i>
@@ -779,8 +786,14 @@ export default function Schools() {
                         </svg>
                       </i>
                       <div className="event-figure">
-                        <h5>10</h5>
-                        <span>Hết Hàng</span>
+
+                        {OutOfStock !== null && (
+                          <>
+                            <p className="OutOfStock">{OutOfStock}</p>
+                            <span className="label">Hết Hàng</span>
+                          </>
+                        )}
+                        
                       </div>
                     </div>
                   </div>
@@ -806,8 +819,12 @@ export default function Schools() {
                         </svg>
                       </i>
                       <div className="event-figure">
-                        <h5>41</h5>
-                        <span>Số Công Ty</span>
+                        {quanlity !== null && (
+                          <>
+                            <p className="quanlity">{quanlity}</p>
+                            <span className="label">Số Công Ty</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -838,7 +855,7 @@ export default function Schools() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
               <button
                 className="main-btn"
@@ -856,13 +873,13 @@ export default function Schools() {
                   marginBottom: 26,
                 }}
               >
-                Tạo sản phẩm trong kho
+                Tạo Dòng Sữa
               </button>
               <div className="row merged20 mb-4">
                 <div className="col-lg-12">
                   <div className="d-widget">
                     <div className="d-widget-title">
-                      <h5>Tất cả các sản phẩm có trong kho</h5>
+                      <h5>Tất cả các dòng sữa có trong hệ thống</h5>
                     </div>
                     <table className="table table-default all-events table-striped table-responsive-lg">
                       <thead>
@@ -873,7 +890,7 @@ export default function Schools() {
                           <th>Gía</th>
                           <th>Size</th>
                           <th>Hình</th>
-                          <th>Edit</th>
+                          <th>Chỉnh sửa</th>
                         </tr>
                       </thead>
                       <tbody>{renderSchools()}</tbody>
@@ -889,12 +906,12 @@ export default function Schools() {
 
 
 
-              <div className="row merged20 mb-4">
+              {/* <div className="row merged20 mb-4">
                 <div className="col-lg-6">
                   <div className="d-widget">
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -912,8 +929,8 @@ export default function Schools() {
               element.classList.remove("active");
               setStateAdd("Create");
               document.getElementById("txtQuantity").value = "";
-        document.getElementById("txtPrice").value = "";
-        document.getElementById("txtSize").value = "";
+              document.getElementById("txtPrice").value = "";
+              document.getElementById("txtSize").value = "";
               //setElementUpdate(undefined);
             }}
             className="popup-closed"
@@ -951,7 +968,7 @@ export default function Schools() {
                   }}
                   id="popup-head-name"
                 >
-                  Tạo sản phẩm trong kho
+                  Tạo Dòng Sữa
                 </p>
               </h5>
             </div>
@@ -961,7 +978,7 @@ export default function Schools() {
               className="c-form"
             >
 
-<div
+              <div
                 style={{
                   display: "flex",
                   marginTop: 20,
@@ -979,7 +996,7 @@ export default function Schools() {
                 </p>
                 <select
                   onChange={onChangeSelect}
-                 
+
                   id="txtProductId"
                   style={{
                     padding: 10,
@@ -1066,11 +1083,11 @@ export default function Schools() {
                     width: "20%",
                   }}
                 >
-                  Size:{" "}
+                  Khối lượng:{" "}
                 </p>
                 <input
                   required
-                  placeholder="Nhập size"
+                  placeholder="Nhập Khối Lượng"
                   style={{
                     width: "100%",
                     padding: 10,
@@ -1079,7 +1096,7 @@ export default function Schools() {
                 />
               </div>
 
-              
+
               <button
                 className="main-btn"
                 style={{
@@ -1093,13 +1110,13 @@ export default function Schools() {
                   marginRight: "auto",
                 }}
               >
-                Tạo 
+                Tạo
               </button>
             </form>
           </div>
         </div>
       </div>
-      
+
 
       <div id="delete-post" className="post-new-popup">
         <div className="popup" style={{ width: "800px" }}>
