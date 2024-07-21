@@ -82,7 +82,7 @@ export default function Group() {
         );
         if (response.status === 200) {
           await getAllGroups();
-          alert("Tạo company thành công");
+          alert("Tạo công ty thành công");
           setStateAdd("Create");
           document.getElementById("txtName").value = "";
           document.getElementById("txtDesciption").value = "";
@@ -100,7 +100,7 @@ export default function Group() {
     }
   };
   const updateGroup = async () => {
-    if (document.getElementById("txtSelectCountry").value != "Chọn quốc gia") {
+    if (document.getElementById("txtSelectCountry").value != "Chọn sản phẩm") {
       try {
         const formData = new FormData();
         formData.append("Id", schoolEdit);
@@ -223,76 +223,9 @@ export default function Group() {
       console.error(err);
     }
   };
-  const getImageByPostId = async (postId) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/images/postid?postId=${postId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        for (let i = 0; i < response.data.length; i++) {
-          await deleteImageInPost(response.data[i].id);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const deleteImageInPost = async (idImage) => {
-    try {
-      const response = await axios.delete(
-        `https://truongxuaapp.online/api/v1/images/${idImage}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const getCommentByPostId = async (postId) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/posts/comments/postid?postId=${postId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        for (let i = 0; i < response.data.length; i++) {
-          await deleteCommentInPost(response.data[i].id);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const deleteCommentInPost = async (idComment) => {
-    try {
-      const response = await axios.delete(
-        `https://truongxuaapp.online/api/v1/posts/comments/${idComment}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  
+ 
+  
 
   const deleteAGroup = async (idGroup) => {
     try {
@@ -301,7 +234,7 @@ export default function Group() {
       );
       if (response.status === 200) {
         document.getElementById("delete-post").classList.remove("active");
-        alert("Xóa thành công nhóm");
+        alert("Xóa thành công công ty này");
         await getAllGroups();
       }
     } catch (err) {
@@ -312,7 +245,7 @@ export default function Group() {
     return groups.map((element, index) => {
       return (
         <tr key={index}>
-          <td>{element.id}</td>
+          <td>{index+1}</td>
           <td>{element.name}</td>
           <td className="text-success">{element.description}</td>
           <td>{element.nation}</td>
@@ -691,7 +624,7 @@ export default function Group() {
                 </i>
               </div>
               <div className="page-title">
-                <h4>All Company</h4>
+                <h4>All Company.</h4>
               </div>
             </div>
             <div className="col-lg-6 col-md-6 col-sm-6">
@@ -746,13 +679,13 @@ export default function Group() {
                     <table className="table table-default all-events table-striped table-responsive-lg">
                       <thead>
                         <tr>
-                          <th>ID#</th>
+                          <th>STT</th>
                           <th>Tên công ty</th>
                           <th>Mô Tả</th>
                           <th>Quốc Gia</th>
                           <th>Link</th>
                           <th>Hình ảnh</th>
-                          <th>Edit</th>
+                          <th>Chỉnh sửa</th>
                         </tr>
                       </thead>
                       <tbody>{renderAllGroups()}</tbody>

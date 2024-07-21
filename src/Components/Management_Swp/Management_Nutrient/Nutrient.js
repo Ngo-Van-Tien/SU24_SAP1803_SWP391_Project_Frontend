@@ -29,74 +29,74 @@ export default function Nutrient() {
     }
   };
   const addGroup = async () => {
-    
-    
-        try {
-          const data = {
-            milfuncion: document.getElementById("txtnutrient").value,
-           
-          };
-          const formData = new FormData();
-          formData.append('Name', document.getElementById("txtnutrient").value);  
-           
-          console.log(data)
-          const response = await axios.post(
-            "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/AddNutrient",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-                Authorization: "Bearer " + localStorage.authorization,
-              },
-            }
-          );
-          if (response.status === 200) {
-            await getAllGroups();
-            alert("Tạo chất dinh dưỡng thành công");
-            setStateAdd("Create");
-            document.getElementById("txtnutrient").value = "";
-            
-            var elementTest = document.getElementById("post-new");
-            elementTest.classList.remove("active");
-          }
-        } catch (err) {
-          console.error(err);
+
+
+    try {
+      const data = {
+        milfuncion: document.getElementById("txtnutrient").value,
+
+      };
+      const formData = new FormData();
+      formData.append('Name', document.getElementById("txtnutrient").value);
+
+      console.log(data)
+      const response = await axios.post(
+        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/AddNutrient",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + localStorage.authorization,
+          },
         }
-     
+      );
+      if (response.status === 200) {
+        await getAllGroups();
+        alert("Tạo chất dinh dưỡng thành công");
+        setStateAdd("Create");
+        document.getElementById("txtnutrient").value = "";
+
+        var elementTest = document.getElementById("post-new");
+        elementTest.classList.remove("active");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
   };
   const updateGroup = async () => {
-   
-      
-      try {
-        
-        const formData = new FormData();
-        formData.append('Id', schoolEdit); 
-        formData.append('Name', document.getElementById("txtnutrient").value); 
-        console.log(schoolEdit)
-        const response = await axios.put(
-          `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/UpdateNutrient`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: "Bearer " + localStorage.authorization,
-            },
-          }
-        );
-        if (response.status === 200) {
-          await getAllGroups();
-          alert("Cập nhập chất dinh dưỡng thành công ");
-          
-          setStateAdd("Create");
-          document.getElementById("txtnutrient").value = "";
-         
-          var elementTest = document.getElementById("post-new");
-          elementTest.classList.remove("active");
+
+
+    try {
+
+      const formData = new FormData();
+      formData.append('Id', schoolEdit);
+      formData.append('Name', document.getElementById("txtnutrient").value);
+      console.log(schoolEdit)
+      const response = await axios.put(
+        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/UpdateNutrient`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + localStorage.authorization,
+          },
         }
-      } catch (err) {
-        console.error(err);
+      );
+      if (response.status === 200) {
+        await getAllGroups();
+        alert("Cập nhập chất dinh dưỡng thành công ");
+
+        setStateAdd("Create");
+        document.getElementById("txtnutrient").value = "";
+
+        var elementTest = document.getElementById("post-new");
+        elementTest.classList.remove("active");
       }
-   
+    } catch (err) {
+      console.error(err);
+    }
+
   };
   const getGroupRecent = async (id) => {
     try {
@@ -107,17 +107,15 @@ export default function Nutrient() {
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + localStorage.authorization,
-            
+
           },
         }
       );
-      
-
       if (response.status === 200) {
-        setGroupRecent(response.data);
-        document.getElementById("txtnutrient").value = response.data.name;
-        
-        setSchoolEdit(id);
+        const nutrientData = response.data.nutrient; 
+        setGroupRecent(nutrientData); 
+        document.getElementById("txtnutrient").value = nutrientData.name; 
+        setSchoolEdit(nutrientData.id); 
         getAllSchool();
       }
     } catch (err) {
@@ -128,7 +126,7 @@ export default function Nutrient() {
   const getAllSchool = () => {
     setSchools(Country);
   };
- 
+
   const getAllGroups = async () => {
     try {
       const response = await axios.get(
@@ -148,12 +146,12 @@ export default function Nutrient() {
     }
   };
 
- 
+
 
   const deleteAGroup = async (idGroup) => {
     try {
       const response = await axios.delete(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkFunction/DeletetMilkFunction?id=${idGroup}`,
+        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/DeleteNutrient?id=${idGroup}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -163,7 +161,7 @@ export default function Nutrient() {
       );
       if (response.status === 200) {
         document.getElementById("delete-post").classList.remove("active");
-        alert("Xóa thành công ty");
+        alert("Xóa thành công");
         await getAllGroups();
       }
     } catch (err) {
@@ -174,7 +172,7 @@ export default function Nutrient() {
     return groups.map((element, index) => {
       return (
         <tr key={index}>
-          <td>{index+1}</td>
+          <td>{index + 1}</td>
           <td>{element.name}</td>
           <td className="text-success">{element.description}</td>
           <td>
@@ -599,7 +597,7 @@ export default function Nutrient() {
                           <th>STT</th>
                           <th>Chất dinh dưỡng</th>
                           <th></th>
-                          <th>Edit</th>
+                          <th>Chỉnh sửa</th>
                         </tr>
                       </thead>
                       <tbody>{renderAllGroups()}</tbody>
@@ -607,16 +605,8 @@ export default function Nutrient() {
                   </div>
                 </div>
               </div>
-              <div className="row merged20 mb-4">
-                <div className="col-lg-6">
-                  <div className="d-widget">
-                   
-                   
-                  </div>
-                </div>
               
-              </div>
-            
+
             </div>
           </div>
         </div>
@@ -823,7 +813,7 @@ export default function Nutrient() {
               element.classList.remove("active");
               setStateAdd("Create");
               document.getElementById("txtnutrient").value = "";
-              
+
               //setElementUpdate(undefined);
             }}
             className="popup-closed"
@@ -870,7 +860,6 @@ export default function Nutrient() {
               style={{ width: "100%" }}
               className="c-form"
             >
-             
               <div
                 style={{
                   display: "flex",
@@ -897,8 +886,8 @@ export default function Nutrient() {
                   id="txtnutrient"
                 />
               </div>
-            
-          
+
+
               <button
                 className="main-btn"
                 style={{
@@ -912,8 +901,7 @@ export default function Nutrient() {
                   marginRight: "auto",
                 }}
               >
-                
-                { stateAdd == "Create" ? "Tạo chất dinh duõng" : "Cập nhật" }
+                {stateAdd == "Create" ? "Tạo chất dinh duõng" : "Cập nhật"}
               </button>
             </form>
           </div>
@@ -939,7 +927,7 @@ export default function Nutrient() {
                   }}
                   id="popup-head-name"
                 >
-                  Bạn có chắn muốn xóa công ty này ?
+                  Bạn có chắn muốn xóa chất dinh dưỡng này ?
                 </p>
               </h5>
             </div>

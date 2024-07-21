@@ -388,7 +388,7 @@ export default function OrderDetail() {
                   </i>
                 </div>
                 <div className="page-title">
-                  <h4>All Orderdetail</h4>
+                  <h4>All OrderDetail.</h4>
                 </div>
               </div>
               <div className="col-lg-6 col-md-6 col-sm-6">

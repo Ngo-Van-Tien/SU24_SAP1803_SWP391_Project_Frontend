@@ -250,7 +250,9 @@ export default function ProductNutrient() {
   const getAllSchool = () => {
     setSchools(Country);
   };
- 
+  const handleBackClick = () => {
+    history.goBack();
+  };
   const getAllGroups = async () => {
     try {
       const response = await axios.get(
@@ -698,23 +700,18 @@ export default function ProductNutrient() {
                           <th>STT</th>
                           <th>Chất dinh dưỡng</th>
                           
-                          <th>Edit</th>
+                          <th>Chỉnh sửa</th>
                         </tr>
                       </thead>
                       <tbody>{ product && renderProductNutrient()}</tbody>
                     </table>
                   </div>
+                  <div className="footer">
+        <button className="back-button" onClick={handleBackClick}>Quay Lại</button>
+      </div>
                 </div>
               </div>
-              <div className="row merged20 mb-4">
-                <div className="col-lg-6">
-                  <div className="d-widget">
-                   
-                   
-                  </div>
-                </div>
               
-              </div>
             
             </div>
           </div>

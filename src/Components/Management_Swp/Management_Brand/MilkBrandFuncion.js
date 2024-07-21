@@ -1,252 +1,233 @@
 import axios from "axios";
-import React from "react";
-import { useEffect, useState } from "react/cjs/react.development";
+import React, { useEffect, useState } from "react";
 import SideBar from "../../Sidebar/SideBar";
+import { Country } from "../../Country";
+import { useLocation, useHistory  } from "react-router-dom/cjs/react-router-dom.min";
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 
-export default function News() {
-  const [news, setNews] = useState([]);
-  const [stateAdd, setStateAdd] = useState("Create");
+
+
+export default function MilkBrandFuncion() {
+  const [groups, setGroups] = useState([]);
   const [schools, setSchools] = useState([]);
-  const [newsRecent, setNewsRecent] = useState({});
-  const [updateSchoolId, setUpdateSchoolId] = useState(-1);
-  const [deleteNewsId, setDeteleNewsId] = useState(-1);
+  const [stateAdd, setStateAdd] = useState("Create");
+  const [schoolEdit, setSchoolEdit] = useState(-1);
 
+  const [groupRecent, setGroupRecent] = useState({});
+  const [deleteGroupId, setDeleteGroupId] = useState(-1);
+  const [milkfuncion, setMilkFuncion] = useState([]);
+  const onChangeSelect = async (event) => {
+  };
+
+  const [brand, setBrand] = useState();
+    let query = useQuery();
+    let id = query.get('id');
+    const history = useHistory();
+    
   useEffect(async () => {
-    await getAllNews();
     await getAllSchool();
+    await getAllGroups();
+    await getallMilkBrandFuncion();
+    await getallMilkFuncion()
   }, []);
-  const getInFoSchoolById = async (idSchool) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/schools/${idSchool}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        return response.data;
-      }
-    } catch (err) {
-      console.error(err);
-    }
+
+  const clickToUpdate = async (id) => {
+   
+    
   };
   const changeSubmit = async (event) => {
     event.preventDefault();
     if (stateAdd == "Create") {
-      await addANews();
+      await addGroup();
     } else {
-      await updateANews();
+      await updateGroup();
     }
   };
-  const addANews = async () => {
-    if (document.getElementById("txtSelectSchool").value != "Chọn trường") {
-      try {
-        const data = {
-          schoolId: document.getElementById("txtSelectSchool").value,
-          title: document.getElementById("titleID").value,
-          content: document.getElementById("emojionearea1").value,
-          createAt: new Date(),
-          modifiedAt: null,
-          status: true,
-        };
+
+  const addGroup = async () => {
+    try {
+       
+        const query = new URLSearchParams(window.location.search);
+        const id = query.get('id');
+        
+        
+        const nutrientId = document.getElementById("txtSelectMilkBrandFuncion").value;
+
+        
+        const formData = new FormData();
+        formData.append("Id", id);
+        formData.append("MilkFunctionIds", nutrientId);
+
+      
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+
         const response = await axios.post(
-          "https://truongxuaapp.online/api/v1/news",
-          data,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + localStorage.authorization,
-            },
-          }
+            "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/addmilkfunctiontomilkbrand",
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: "Bearer " + localStorage.authorization,
+                },
+            }
+        );
+
+        if (response.status === 200) {
+            await getallMilkBrandFuncion();
+            alert("Thêm chức năng sữa thành công");
+            setStateAdd("Create");
+
+            document.getElementById("txtSelectMilkBrandFuncion").value = "";
+
+           
+            var elementTest = document.getElementById("post-new");
+            elementTest.classList.remove("active");
+        }
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+
+const updateGroup = async () => {
+  try {
+    const formData = new FormData();
+    formData.append("Id", schoolEdit);
+    formData.append("Name", document.getElementById("txtMilkBrandFuncion").value);
+    
+    const response = await axios.post(
+      `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/updatemilkfunctions`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: "Bearer " + localStorage.authorization,
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      await getAllGroups();
+      alert("Cập nhật chức năng sữa thành công");
+      setStateAdd("Create");
+      document.getElementById("txtMilkBrandFuncion").value = "";
+      var elementTest = document.getElementById("post-new");
+      elementTest.classList.remove("active");
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+  const getallMilkBrandFuncion = async () => {
+    try {
+        // Create a new FormData object
+        const formData = new FormData();
+        formData.append( "Id",id ); 
+
+        const response = await axios.post(
+            `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/getmilkfuntionsbymilkbrandid`, 
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: "Bearer " + localStorage.authorization,
+                },
+            }
         );
         if (response.status === 200) {
-          setStateAdd("Create");
-          document.getElementById("titleID").value = "";
-          document.getElementById("emojionearea1").value = "";
-          await getAllNews();
-          alert("Tạo bài News thành công");
-          var elementTest = document.getElementById("post-new");
-          elementTest.classList.remove("active");
+            setBrand(response.data.data);
+            console.log(response.data.data);
         }
-      } catch (err) {
+    } catch (err) {
         console.error(err);
-      }
-    } else {
-      alert("Vui lòng chọn trường");
     }
-  };
-  const updateANews = async () => {
-    try {
-      const data = {
-        schoolId: document.getElementById("txtSelectSchool").value,
-        title: document.getElementById("titleID").value,
-        content: document.getElementById("emojionearea1").value,
-        createAt: newsRecent.createAt,
-        modifiedAt: new Date(),
-        status: true,
-      };
-      const response = await axios.put(
-        `https://truongxuaapp.online/api/v1/news?id=${newsRecent.id}`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        setStateAdd("Create");
-        document.getElementById("titleID").value = "";
-        document.getElementById("emojionearea1").value = "";
-        await getAllNews();
-        alert("Cập nhật bài News thành công");
-        var elementTest = document.getElementById("post-new");
-        elementTest.classList.remove("active");
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const getAllNews = async () => {
-    try {
-      const response = await axios.get(
-        "https://truongxuaapp.online/api/v1/news?pageNumber=1&pageSize=0",
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        for (let i = 0; i < response.data.length; i++) {
-          const dataSchool = await getInFoSchoolById(response.data[i].schoolId);
-          response.data[i].infoSchool = dataSchool;
-        }
-        setNews(response.data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const clickToUpdate = async (id) => {
-    await getNewsById(id);
-  };
-  const getNewsById = async (idNews) => {
-    try {
-      const response = await axios.get(
-        `https://truongxuaapp.online/api/v1/news/${idNews}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
-        }
-      );
-      if (response.status === 200) {
-        setNewsRecent(response.data);
-        //titleID-emojionearea1
-        setUpdateSchoolId(response.data.schoolId);
-        document.getElementById("titleID").value = response.data.title;
-        document.getElementById("emojionearea1").value = response.data.content;
-        await getAllSchool();
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const renderAllNews = () => {
-    return news.map((element, index) => {
-      const startDate = new Date(element.createAt);
+};
 
-      let editDate = null;
-      if (element.modifiedAt != null && element.modifiedAt != "") {
-        //console.log(element.modifiedAt);
-        editDate = new Date(element.modifiedAt);
-      }
+  const renderProductNutrient = () => {
+    return brand.map((element, index) => {
       return (
         <tr key={index}>
-          <td>{element.id}</td>
-          <td>{element.infoSchool.name}</td>
-          <td>{element.title}</td>
-          <td>{element.content}</td>
+          <td>{index+1}</td>
+          <td>{element.name}</td>
           <td>
-            {startDate.getDate() +
-              "/" +
-              startDate.getMonth() +
-              "/" +
-              startDate.getFullYear() +
-              " " +
-              startDate.getHours() +
-              ":" +
-              startDate.getMinutes()}
-          </td>
-          <td>
-            {element.modifiedAt != null && element.modifiedAt != ""
-              ? editDate.getDate() +
-                "/" +
-                editDate.getMonth() +
-                "/" +
-                editDate.getFullYear() +
-                " " +
-                editDate.getHours() +
-                ":" +
-                editDate.getMinutes()
-              : "Bài viết này chưa được chỉnh sửa"}
-          </td>
-          <td>
+
             <div
               onClick={() => {
                 var elementTest = document.getElementById("delete-post");
                 elementTest.classList.add("active");
-                setDeteleNewsId(element.id);
+                setDeleteGroupId(element);
               }}
               style={{
-                marginBottom: 16,
+                marginBottom: 10,
               }}
               className="button soft-danger"
             >
               <i className="icofont-trash" />
+              
             </div>
+            
             <div
               onClick={() => {
                 var elementTest = document.getElementById("post-new");
                 elementTest.classList.add("active");
+                setStateAdd("Update");
                 setSchools([]);
                 clickToUpdate(element.id);
-                setStateAdd("Update");
               }}
               className="button soft-primary"
             >
               <i className="icofont-pen-alt-1" />
             </div>
+            
           </td>
         </tr>
       );
     });
   };
-  const renderOptionSchools = (indexSelect) => {
-    return schools.map((element, index) => {
-      if (indexSelect == undefined) {
+
+  const getallMilkFuncion = async () => {
+    try {
+      const response = await axios.get(
+        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkFunction/GetAll",
+        {
+          headers: {
+            
+            Authorization: "Bearer " + localStorage.authorization,
+          },
+        }
+      );
+      
+      if (response.status === 200) {
+        setMilkFuncion(response.data.data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const renderAllMilkBrandFuncion = (selectIndex) => {
+    return milkfuncion.map((element, index) => {
+      if (selectIndex == undefined) {
         return (
-          <option key={index} value={element.id}>
+          <option value={element.id} key={index}>
             {element.name}
           </option>
         );
       } else {
-        if (indexSelect == element.id) {
+        if (selectIndex == element.id) {
           return (
-            <option key={index} value={element.id} selected>
+            <option value={element.id} key={index} selected>
               {element.name}
             </option>
           );
         } else {
           return (
-            <option key={index} value={element.id}>
+            <option value={element.id} key={index}>
               {element.name}
             </option>
           );
@@ -254,13 +235,20 @@ export default function News() {
       }
     });
   };
-  const onChangeSelect = (event) => {
-    console.log(event.target.value);
+
+
+
+
+
+ 
+  const getAllSchool = () => {
+    setSchools(Country);
   };
-  const getAllSchool = async () => {
+ 
+  const getAllGroups = async () => {
     try {
       const response = await axios.get(
-        "https://truongxuaapp.online/api/v1/schools?pageNumber=1&pageSize=0",
+        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/GetNutrients",
         {
           headers: {
             "Content-Type": "application/json",
@@ -269,33 +257,52 @@ export default function News() {
         }
       );
       if (response.status === 200) {
-        setSchools(response.data);
+        setGroups(response.data.data);
       }
     } catch (err) {
       console.error(err);
     }
   };
-  const deleteANews = async () => {
+  const handleBackClick = () => {
+    history.goBack();
+  };
+  const deleteAGroup = async (nutrient) => {
     try {
-      const response = await axios.delete(
-        `https://truongxuaapp.online/api/v1/news/${deleteNewsId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.authorization,
-          },
+        console.log(nutrient);
+
+        // Tạo một đối tượng FormData
+        const formData = new FormData();
+        formData.append("Id", id);
+        formData.append("NutrientId", nutrient.id);
+
+        const response = await axios.post(
+            `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/deletenutrientsbyproductid`,
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: "Bearer " + localStorage.authorization,
+                }
+            }
+        );
+
+        if (response.status === 200) {
+            document.getElementById("delete-post").classList.remove("active");
+            alert("Xóa thành công chức năng sữa");
+            await getAllGroups();
         }
-      );
-      if (response.status === 200) {
-        alert("Xóa thành công bài News");
-        var elementTest = document.getElementById("delete-post");
-        elementTest.classList.remove("active");
-        await getAllNews();
-      }
     } catch (err) {
-      console.error(err);
+        if (err.response && err.response.status === 400) {
+            console.log("Validation errors occurred:", err.response.data.errors);
+        } else {
+            console.log(err);
+        }
     }
-  };
+};
+
+
+
+
   return (
     <div className="theme-layout">
       <div className="responsive-header">
@@ -603,7 +610,6 @@ export default function News() {
         </div>
       </header>
       {/* header */}
-
       <div className="top-sub-bar">
         <div className="container-fluid">
           <div className="row">
@@ -630,7 +636,7 @@ export default function News() {
                 </i>
               </div>
               <div className="page-title">
-                <h4>Tất cả các bài news</h4>
+                <h4>All Nutrient</h4>
               </div>
             </div>
             <div className="col-lg-6 col-md-6 col-sm-6">
@@ -642,7 +648,7 @@ export default function News() {
                 </li>
                 <li>
                   <a href="#" title>
-                    All Events
+                    All Nutrient
                   </a>
                 </li>
               </ul>
@@ -657,128 +663,7 @@ export default function News() {
         <div className="row">
           <div className="col-lg-12">
             <div className="panel-content">
-              <h4 className="main-title">Quản lý bài News</h4>
-              <div className="row merged20 mb-4">
-                <div className="col-lg-3 col-md-6">
-                  <div className="d-widget">
-                    <div className="event-stat">
-                      <i>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width={20}
-                          height={20}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="feather feather-calendar"
-                        >
-                          <rect
-                            x={3}
-                            y={4}
-                            width={18}
-                            height={18}
-                            rx={2}
-                            ry={2}
-                          />
-                          <line x1={16} y1={2} x2={16} y2={6} />
-                          <line x1={8} y1={2} x2={8} y2={6} />
-                          <line x1={3} y1={10} x2={21} y2={10} />
-                        </svg>
-                      </i>
-                      <div className="event-figure">
-                        <h5>{news.length}</h5>
-                        <span>bài News</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-3 col-md-6 ">
-                  <div className="d-widget">
-                    <div className="event-stat">
-                      <i>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width={14}
-                          height={14}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="feather feather-users"
-                        >
-                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                          <circle cx={9} cy={7} r={4} />
-                          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                        </svg>
-                      </i>
-                      <div className="event-figure">
-                        <h5>1200</h5>
-                        <span>Registered Users</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-3 col-md-6">
-                  <div className="d-widget">
-                    <div className="event-stat">
-                      <i>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width={24}
-                          height={24}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="feather feather-file"
-                        >
-                          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
-                          <polyline points="13 2 13 9 20 9" />
-                        </svg>
-                      </i>
-                      <div className="event-figure">
-                        <h5>4021</h5>
-                        <span>Tickets Sold</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-3 col-md-6">
-                  <div className="d-widget">
-                    <div className="event-stat">
-                      <i>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width={20}
-                          height={20}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="feather feather-dollar-sign"
-                        >
-                          <line x1={12} y1={1} x2={12} y2={23} />
-                          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                        </svg>
-                      </i>
-                      <div className="event-figure">
-                        <h5>$1400</h5>
-                        <span>Earnigns</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <h4 className="main-title">Quản Lý chức năng sữa</h4>
               <button
                 className="main-btn"
                 onClick={() => {
@@ -795,232 +680,42 @@ export default function News() {
                   marginBottom: 26,
                 }}
               >
-                Tạo bài News
+                Tạo chức năng sữa
               </button>
               <div className="row merged20 mb-4">
                 <div className="col-lg-12">
                   <div className="d-widget">
                     <div className="d-widget-title">
-                      <h5>Tất cả bài News của trường</h5>
+                      <h5>Tất cả các chức năng sữa</h5>
                     </div>
                     <table className="table table-default all-events table-striped table-responsive-lg">
                       <thead>
                         <tr>
-                          <th>ID#</th>
-                          <th>Trường</th>
-                          <th>Title</th>
-                          <th>Content</th>
-                          <th>Create At</th>
-                          <th>Modified At</th>
-                          <th>Edit</th>
+                          <th>STT</th>
+                          <th>Chức năng Sữa</th>
+                          
+                          <th>Chỉnh sửa</th>
                         </tr>
                       </thead>
-                      <tbody>{renderAllNews()}</tbody>
+                      <tbody>{ brand && renderProductNutrient()}</tbody>
                     </table>
+                    <div className="footer">
+        <button className="back-button" onClick={handleBackClick}>Quay Lại</button>
+      </div>
                   </div>
+                  
                 </div>
               </div>
-              <div className="row merged20 mb-4">
-                <div className="col-lg-6">
-                  <div className="d-widget">
-                    <div className="d-widget-title">
-                      <h5>Events Schedule</h5>
-                    </div>
-                    <ul className="upcoming-event">
-                      <li>
-                        <div className="event-date soft-red">
-                          <i>24 FEB</i>
-                          <span>2021</span>
-                        </div>
-                        <div className="event-deta">
-                          <h5>digital marketing summit</h5>
-                          <ul>
-                            <li>
-                              <i className="icofont-user" /> steve Josef
-                            </li>
-                            <li>
-                              <i className="icofont-map-pins" /> New York City
-                            </li>
-                            <li>
-                              <i className="icofont-clock-time" /> 9:00PM-12AM
-                            </li>
-                          </ul>
-                        </div>
-                      </li>
-                      <li>
-                        <div className="event-date soft-green">
-                          <i>10 MAR</i>
-                          <span>2021</span>
-                        </div>
-                        <div className="event-deta">
-                          <h5>digital marketing summit</h5>
-                          <ul>
-                            <li>
-                              <i className="icofont-user" /> steve Josef
-                            </li>
-                            <li>
-                              <i className="icofont-map-pins" /> New York City
-                            </li>
-                            <li>
-                              <i className="icofont-clock-time" /> 9:00PM-12AM
-                            </li>
-                          </ul>
-                        </div>
-                      </li>
-                      <li>
-                        <div className="event-date soft-blue">
-                          <i>20 OCT</i>
-                          <span>2021</span>
-                        </div>
-                        <div className="event-deta">
-                          <h5>digital marketing summit</h5>
-                          <ul>
-                            <li>
-                              <i className="icofont-user" /> steve Josef
-                            </li>
-                            <li>
-                              <i className="icofont-map-pins" /> New York City
-                            </li>
-                            <li>
-                              <i className="icofont-clock-time" /> 9:00PM-12AM
-                            </li>
-                          </ul>
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="col-lg-6">
-                  <div className="d-widget">
-                    <div className="d-widget-title">
-                      <h5>Web Traffic</h5>
-                      <select className="browser-default custom-select">
-                        <option value={3}>last day</option>
-                        <option value={2}>week</option>
-                        <option selected>Monthly</option>
-                        <option value={1}>Yearly</option>
-                      </select>
-                    </div>
-                    <div className="web-traffic">
-                      <div className="chart-legend">
-                        <p>Today's visitors</p>
-                        <h5>98,300</h5>
-                      </div>
-                      <div id="hybrid_traffic" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="row merged20 mb-4">
-                <div className="col-lg-6">
-                  <div className="d-widget">
-                    <div className="d-widget-title">
-                      <h5>Notice Borad</h5>
-                    </div>
-                    <div className="d-Notices">
-                      <ul>
-                        <li>
-                          <p>March 21, 2021</p>
-                          <h6>
-                            <a href="#" title>
-                              Mr. William
-                            </a>{" "}
-                            <span>5 mint ago</span>
-                          </h6>
-                          <p>
-                            invited to join the meeting in the conference room
-                            at 9.45 am
-                          </p>
-                          <div className="action-btns">
-                            <div className="button soft-danger" title="ignore">
-                              <i className="icofont-trash" />
-                            </div>
-                            <div className="button soft-primary" title="save">
-                              <i className="icofont-star" />
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <p>Feb 15, 2021</p>
-                          <h6>
-                            <a href="#" title>
-                              Andrew{" "}
-                            </a>{" "}
-                            <span>35 mint ago</span>
-                          </h6>
-                          <p>
-                            created a group 'Hencework' in the discussion forum
-                          </p>
-                          <div className="action-btns">
-                            <div className="button soft-danger" title="ignore">
-                              <i className="icofont-trash" />
-                            </div>
-                            <div className="button soft-primary" title="save">
-                              <i className="icofont-star" />
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <p>Jan 10, 2021</p>
-                          <h6>
-                            <a href="#" title>
-                              Franklyn J.
-                            </a>{" "}
-                            <span>40 mint ago</span>
-                          </h6>
-                          <p>Prepare the conference schedule</p>
-                          <div className="action-btns">
-                            <div className="button soft-danger" title="ignore">
-                              <i className="icofont-trash" />
-                            </div>
-                            <div className="button soft-primary" title="save">
-                              <i className="icofont-star" />
-                            </div>
-                          </div>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-6">
-                  <div className="d-widget">
-                    <div className="d-widget-title">
-                      <h5>Logs</h5>
-                    </div>
-                    <ul className="recent-log">
-                      <li className="hole-circle red-circle">
-                        <span>New User Registration</span> <i>23:13</i>
-                      </li>
-                      <li className="hole-circle blue-circle">
-                        <span>New 14 products added.</span> <i>22:10</i>
-                      </li>
-                      <li className="hole-circle green-circle">
-                        <span>New sale: Napole.</span> <i>21:33</i>
-                      </li>
-                      <li className="hole-circle yellow-circle">
-                        <span>New notifications</span> <i>20:40</i>
-                      </li>
-                      <li className="hole-circle orange-circle">
-                        <span>New Comments</span> <i>19:20</i>
-                      </li>
-                      <li className="hole-circle blue-circle">
-                        <span>New sale: souffle.</span> <i>18:00</i>
-                      </li>
-                      <li className="hole-circle yellow-circle">
-                        <span>New notifications</span> <i>20:40</i>
-                      </li>
-                      <li className="hole-circle red-circle">
-                        <span>New User Registration</span> <i>23:13</i>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
+             
+            
             </div>
           </div>
+          
         </div>
       </div>
       {/* main content */}
+
+      
       <div className="popup-wraper">
         <div className="popup">
           <span className="popup-closed">
@@ -1221,15 +916,8 @@ export default function News() {
               var element = document.getElementById("post-new");
               element.classList.remove("active");
               setStateAdd("Create");
-              document.getElementById("titleID").value = "";
-              document.getElementById("emojionearea1").value = "";
-              // document.getElementById("txtName").value = "";
-              // document.getElementById("txtPhone").value = "";
-              // document.getElementById("txtDesciption").value = "";
-              // document.getElementById("txtWebsite").value = "";
-              // document.getElementById("txtHeadmaster").value = "";
-              // document.getElementById("txtAddress").value = "";
-              // document.getElementById("txtAvaSchool").value = "";
+              document.getElementById("txtnutrient").value = "";
+              
               //setElementUpdate(undefined);
             }}
             className="popup-closed"
@@ -1267,7 +955,7 @@ export default function News() {
                   }}
                   id="popup-head-name"
                 >
-                  Tạo bài News của trường
+                  Cập nhật chức năng sữa
                 </p>
               </h5>
             </div>
@@ -1276,7 +964,8 @@ export default function News() {
               style={{ width: "100%" }}
               className="c-form"
             >
-              <div
+             
+             <div
                 style={{
                   display: "flex",
                   marginTop: 20,
@@ -1285,98 +974,46 @@ export default function News() {
               >
                 <p
                   style={{
-                    marginRight: 20,
-                    fontSize: 24,
+                    fontSize: 20,
                     fontWeight: 700,
                     width: "20%",
                   }}
                 >
-                  Chọn trường:{" "}
+                  Chọn chức năng sữa:{" "}
                 </p>
                 <select
                   onChange={onChangeSelect}
-                  id="txtSelectSchool"
+                  id="txtSelectMilkBrandFuncion"
                   style={{
                     padding: 10,
                     width: "30%",
                     marginRight: 10,
                   }}
                 >
-                  <option>Chọn trường</option>
+                  <option>Chọn chức năng sữa</option>
                   {stateAdd == "Create"
-                    ? renderOptionSchools()
-                    : renderOptionSchools(updateSchoolId)}
-                  {/* {stateAdd == "Create"
-                    ? renderAllSchool()
-                    : renderAllSchool(schoolEdit)} */}
+                    ? renderAllMilkBrandFuncion()
+                    : renderAllMilkBrandFuncion(schoolEdit)}
                 </select>
               </div>
-              <div
+
+          
+              <button
+                className="main-btn"
                 style={{
-                  display: "flex",
-                  marginTop: 20,
-                  alignItems: "baseline",
+                  padding: 10,
+                  backgroundColor: "#088DCD ",
+                  color: "white",
+                  borderWidth: 1,
+                  borderColor: "#088DCD ",
+                  display: "block",
+                  marginLeft: "auto",
+                  marginRight: "auto",
                 }}
               >
-                <p
-                  style={{
-                    marginRight: 20,
-                    fontSize: 24,
-                    fontWeight: 700,
-                  }}
-                >
-                  Tiêu đề:{" "}
-                </p>
-                <input
-                  required
-                  placeholder="Tiêu đề bài đăng"
-                  style={{
-                    width: "80%",
-                    padding: 10,
-                  }}
-                  id="titleID"
-                />
-              </div>
-              <div className="post-new">
-                <p
-                  style={{
-                    marginRight: 20,
-                    fontSize: 24,
-                    fontWeight: 700,
-                  }}
-                >
-                  Nội dung
-                </p>
-
-                <textarea
-                  id="emojionearea1"
-                  placeholder="Nhập nội dung của bài đăng"
-                  defaultValue={""}
-                  style={{
-                    height: 170,
-                  }}
-                  required
-                />
-
-                {/* <div id="loadImg"></div> */}
-                <button
-                  style={{
-                    padding: 10,
-                    backgroundColor: "#088DCD ",
-                    color: "white",
-                    borderWidth: 1,
-                    borderColor: "#088DCD ",
-                    display: "block",
-                    marginBottom: 10,
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                  }}
-                  type="submit"
-                  className="main-btn"
-                >
-                  Đăng bài
-                </button>
-              </div>
+                
+                { stateAdd == "Create" ? "Tạo chức năng của sữa" : "Cập nhật" }
+              </button>
             </form>
           </div>
         </div>
@@ -1401,7 +1038,7 @@ export default function News() {
                   }}
                   id="popup-head-name"
                 >
-                  Bạn có chắn muốn xóa bài đăng này ?
+                  Bạn có chắn muốn xó chức năng sữa ?
                 </p>
               </h5>
             </div>
@@ -1438,7 +1075,7 @@ export default function News() {
                   backgroundColor: "red",
                   float: "right",
                 }}
-                onClick={() => deleteANews(deleteNewsId)}
+                onClick={() => deleteAGroup(deleteGroupId)}
               >
                 Xóa
               </button>

@@ -160,7 +160,7 @@ export default function MilkFuncion() {
       );
       if (response.status === 200) {
         document.getElementById("delete-post").classList.remove("active");
-        alert("Xóa thành công dòng sữa");
+        alert("Xóa thành công");
         await getAllGroups();
       }
     } catch (err) {
@@ -538,7 +538,7 @@ export default function MilkFuncion() {
                 </i>
               </div>
               <div className="page-title">
-                <h4>All Milkfuncion</h4>
+                <h4>All Milkfuncion.</h4>
               </div>
             </div>
             <div className="col-lg-6 col-md-6 col-sm-6">
@@ -596,7 +596,7 @@ export default function MilkFuncion() {
                           <th>STT</th>
                           <th>Chức năng sữa</th>
                           <th></th>
-                          <th>Edit</th>
+                          <th>Chỉnh sửa</th>
                         </tr>
                       </thead>
                       <tbody>{renderAllGroups()}</tbody>
@@ -936,7 +936,7 @@ export default function MilkFuncion() {
                   }}
                   id="popup-head-name"
                 >
-                  Bạn có chắn muốn xóa công ty này ?
+                  Bạn có chắn muốn xóa ?
                 </p>
               </h5>
             </div>
