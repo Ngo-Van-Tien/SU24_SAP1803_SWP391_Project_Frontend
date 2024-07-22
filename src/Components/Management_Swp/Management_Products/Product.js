@@ -637,7 +637,7 @@ export default function Product() {
                 <a href="profile-page2.html" title>
                   <img src="images/resources/user.jpg" alt="" />
                   <div className="name">
-                    <h4>ADMIN</h4>
+                    <h4>Xin Chào</h4>
                   </div>
                 </a>
               </div>

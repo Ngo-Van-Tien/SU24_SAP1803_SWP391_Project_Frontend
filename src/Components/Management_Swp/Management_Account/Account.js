@@ -37,63 +37,7 @@ export default function Group() {
       await updateGroup();
     }
   };
-//   const addGroup = async () => {
-//     try {
-//         const txtFirstName = document.getElementById("txtFirstName");
-//         const txtLastName = document.getElementById("txtLastName");
-//         const txtEmail = document.getElementById("txtEmail");
-//         const txtPassword = document.getElementById("txtPassword");
-//         const txtAddress = document.getElementById("txtAddress");
-//         const txtPhoneNumber = document.getElementById("txtPhoneNumber");
-
-//         // Kiểm tra sự tồn tại của các phần tử
-//         if (!txtFirstName || !txtLastName || !txtEmail || !txtPassword || !txtAddress || !txtPhoneNumber) {
-//             alert("Có lỗi xảy ra: Một hoặc nhiều phần tử không tồn tại trong DOM.");
-//             return;
-//         }
-
-//         const formData = new FormData();
-//         formData.append('FirstName', txtFirstName.value);
-//         formData.append('LastName', txtLastName.value);
-//         formData.append('Email', txtEmail.value);
-//         formData.append('Password', txtPassword.value);
-//         formData.append('Address', txtAddress.value);
-//         formData.append('PhoneNumber', txtPhoneNumber.value);
-
-//         const response = await axios.post(
-//             "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Account/createstaffaccount",
-//             formData,
-//             {
-//                 headers: {
-//                     "Content-Type": "multipart/form-data",
-//                     Authorization: "Bearer " + localStorage.authorization,
-//                 }
-//             }
-//         );
-
-//         if (response.status === 200) {
-//             await getAllGroups();
-//             alert("Tạo Staff thành công");
-//             setStateAdd("Create");
-
-//             // Reset giá trị các ô input
-//             txtFirstName.value = "";
-//             txtLastName.value = "";
-//             txtEmail.value = "";
-//             txtPassword.value = "";
-//             txtAddress.value = "";
-//             txtPhoneNumber.value = "";
-
-//             // Remove active class
-//             var elementTest = document.getElementById("post-new");
-//             elementTest.classList.remove("active");
-//         }
-//     } catch (err) {
-//         console.error(err);
-//     }
-// };
-
-
+  
 const addGroup = async () => {
   const txtFirstName = document.getElementById("txtFirstName");
   const txtLastName = document.getElementById("txtLastName");
@@ -649,7 +593,7 @@ const addGroup = async () => {
                 <a href="profile-page2.html" title>
                   <img src="images/resources/user.jpg" alt="" />
                   <div className="name">
-                    <h4>ADMIN</h4>
+                    <h4>Xin Chào</h4>
                   </div>
                 </a>
               </div>
