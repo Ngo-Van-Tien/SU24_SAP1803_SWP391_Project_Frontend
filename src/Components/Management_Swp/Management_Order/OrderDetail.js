@@ -153,7 +153,7 @@ export default function OrderDetail() {
               <i className="icofont-close-circled" />
             </span>
             <form method="post">
-              <input type="text" placeholder="Search..." />
+             
             </form>
           </div>
         </div>
@@ -166,9 +166,9 @@ export default function OrderDetail() {
             </div>
             <div className="searches">
               <form method="post">
-                <input type="text" placeholder="Search..." />
+              
                 <button type="submit">
-                  <i className="icofont-search" />
+                  <i className="" />
                 </button>
               </form>
             </div>

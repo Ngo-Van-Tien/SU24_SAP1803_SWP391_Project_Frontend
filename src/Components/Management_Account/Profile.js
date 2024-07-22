@@ -173,7 +173,7 @@ export default function Profile() {
               <i className="icofont-close-circled" />
             </span>
             <form method="post">
-              <input type="text" placeholder="Search..." />
+             
             </form>
           </div>
         </div>
@@ -186,9 +186,9 @@ export default function Profile() {
             </div>
             <div className="searches">
               <form method="post">
-                <input type="text" placeholder="Search..." />
+                
                 <button type="submit">
-                  <i className="icofont-search" />
+                  <i className="" />
                 </button>
               </form>
             </div>
@@ -809,7 +809,7 @@ export default function Profile() {
                                 id="switch7"
                               />
                               <label className="switch" htmlFor="switch7" />
-                              <i className="icofont-search-stock" />{" "}
+                              <i className="-stock" />{" "}
                               <span>Show your profile on search engine.</span>
                               <p>
                                 If this setting is turned off, socimo may still

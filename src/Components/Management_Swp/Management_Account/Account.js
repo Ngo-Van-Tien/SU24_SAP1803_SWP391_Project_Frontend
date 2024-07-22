@@ -37,46 +37,140 @@ export default function Group() {
       await updateGroup();
     }
   };
-  const addGroup = async () => {
-    if (
-      document.getElementById("txtSelectCountry").value != "Chọn quốc gia"
-    ) {
-        try {
-          const data = {
-            Name: document.getElementById("txtName").value,
-            Description: document.getElementById("txtDesciption").value,
-            Nation: document.getElementById("txtSelectCountry").value
-          };
-          const formData = new FormData();
-          formData.append('Name', document.getElementById("txtName").value);  
-          formData.append('Description', document.getElementById("txtDesciption").value); 
-          formData.append('Nation', document.getElementById("txtSelectCountry").value); 
-          console.log(data)
-          const response = await axios.post(
-            "https://localhost:7043/api/Company/AddCompany",
-            formData,
-            {
+//   const addGroup = async () => {
+//     try {
+//         const txtFirstName = document.getElementById("txtFirstName");
+//         const txtLastName = document.getElementById("txtLastName");
+//         const txtEmail = document.getElementById("txtEmail");
+//         const txtPassword = document.getElementById("txtPassword");
+//         const txtAddress = document.getElementById("txtAddress");
+//         const txtPhoneNumber = document.getElementById("txtPhoneNumber");
+
+//         // Kiểm tra sự tồn tại của các phần tử
+//         if (!txtFirstName || !txtLastName || !txtEmail || !txtPassword || !txtAddress || !txtPhoneNumber) {
+//             alert("Có lỗi xảy ra: Một hoặc nhiều phần tử không tồn tại trong DOM.");
+//             return;
+//         }
+
+//         const formData = new FormData();
+//         formData.append('FirstName', txtFirstName.value);
+//         formData.append('LastName', txtLastName.value);
+//         formData.append('Email', txtEmail.value);
+//         formData.append('Password', txtPassword.value);
+//         formData.append('Address', txtAddress.value);
+//         formData.append('PhoneNumber', txtPhoneNumber.value);
+
+//         const response = await axios.post(
+//             "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Account/createstaffaccount",
+//             formData,
+//             {
+//                 headers: {
+//                     "Content-Type": "multipart/form-data",
+//                     Authorization: "Bearer " + localStorage.authorization,
+//                 }
+//             }
+//         );
+
+//         if (response.status === 200) {
+//             await getAllGroups();
+//             alert("Tạo Staff thành công");
+//             setStateAdd("Create");
+
+//             // Reset giá trị các ô input
+//             txtFirstName.value = "";
+//             txtLastName.value = "";
+//             txtEmail.value = "";
+//             txtPassword.value = "";
+//             txtAddress.value = "";
+//             txtPhoneNumber.value = "";
+
+//             // Remove active class
+//             var elementTest = document.getElementById("post-new");
+//             elementTest.classList.remove("active");
+//         }
+//     } catch (err) {
+//         console.error(err);
+//     }
+// };
+
+
+const addGroup = async () => {
+  const txtFirstName = document.getElementById("txtFirstName");
+  const txtLastName = document.getElementById("txtLastName");
+  const txtEmail = document.getElementById("txtEmail");
+  const txtPassword = document.getElementById("txtPassword");
+  const txtAddress = document.getElementById("txtAddress");
+  const txtPhoneNumber = document.getElementById("txtPhoneNumber");
+
+  // Kiểm tra sự tồn tại của các phần tử
+  if (!txtFirstName || !txtLastName || !txtEmail || !txtPassword || !txtAddress || !txtPhoneNumber) {
+      alert("Có lỗi xảy ra: Một hoặc nhiều phần tử không tồn tại trong DOM.");
+      return;
+  }
+
+  // Kiểm tra dữ liệu đầu vào
+  console.log({
+      FirstName: txtFirstName.value,
+      LastName: txtLastName.value,
+      Email: txtEmail.value,
+      Password: txtPassword.value,
+      Address: txtAddress.value,
+      PhoneNumber: txtPhoneNumber.value
+  });
+
+  try {
+      const formData = new FormData();
+      formData.append('FirstName', txtFirstName.value);
+      formData.append('LastName', txtLastName.value);
+      formData.append('Email', txtEmail.value);
+      formData.append('Password', txtPassword.value);
+      formData.append('Address', txtAddress.value);
+      formData.append('PhoneNumber', txtPhoneNumber.value);
+
+      // Kiểm tra nội dung của FormData
+      for (let pair of formData.entries()) {
+          console.log(`${pair[0]}: ${pair[1]}`);
+      }
+
+      const response = await axios.post(
+          "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Account/createstaffaccount",
+          formData,
+          {
               headers: {
-                "Content-Type": "multipart/form-data"
-              },
-            }
-          );
-          if (response.status === 200) {
-            await getAllGroups();
-            alert("Tạo company thành công");
-            setStateAdd("Create");
-            document.getElementById("txtName").value = "";
-            document.getElementById("txtDesciption").value = "";
-            var elementTest = document.getElementById("post-new");
-            elementTest.classList.remove("active");
+                  "Content-Type": "multipart/form-data",
+                  Authorization: "Bearer " + localStorage.authorization,
+              }
           }
-        } catch (err) {
-          console.error(err);
-        }
-    } else {
-      alert("Có lỗi rồi");
-    }
-  };
+      );
+
+      if (response.status === 200) {
+          await getAllGroups();
+
+          alert("Tạo Staff thành công");
+          setStateAdd("Create");
+
+          // Reset giá trị các ô input
+          txtFirstName.value = "";
+          txtLastName.value = "";
+          txtEmail.value = "";
+          txtPassword.value = "";
+          txtAddress.value = "";
+          txtPhoneNumber.value = "";
+
+          // Remove active class
+          const elementTest = document.getElementById("post-new");
+          if (elementTest) {
+              elementTest.classList.remove("active");
+          }
+      }
+  } catch (err) {
+      console.error('Error:', err.response ? err.response.data : err.message);
+      alert("Có lỗi xảy ra khi tạo Staff. Vui lòng kiểm tra dữ liệu và thử lại.");
+  }
+};
+
+
+
   const updateGroup = async () => {
     if (
       document.getElementById("txtSelectCountry").value != "Chọn trường" &&
@@ -233,7 +327,7 @@ export default function Group() {
   };
   const onChangeSelect = async (event) => {
   };
-  // const getAllGroups = async () => {
+ 
   //   try {
   //     const response = await axios.get(
   //       "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Account/GetAllUser",
@@ -271,11 +365,17 @@ export default function Group() {
       if (response.status === 200) {
         setGroups(response.data.data);
         setLoader(false)
+        
       }
     } catch (err) {
       console.error(err);
     }
   };
+
+
+
+
+  
   const handlePreviousPage = () => {
     if (pageIndex > 1) {
       setPageIndex(pageIndex - 1);
@@ -358,19 +458,32 @@ export default function Group() {
   };
 
   const deleteAGroup = async (idGroup) => {
+    
     try {
-      const response = await axios.delete(
-        `https://localhost:7043/api/Company/${idGroup}`
+
+      const formData = new FormData();
+      formData.append("Id", idGroup);
+      const response = await axios.post(
+        'http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Account/LockAccount',
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + localStorage.getItem('authorization'),
+          },
+        }
       );
+  
       if (response.status === 200) {
         document.getElementById("delete-post").classList.remove("active");
-        alert("Xóa thành công nhóm");
+        alert("Khóa tài khoản thành công");
         await getAllGroups();
       }
     } catch (err) {
       console.log(err);
     }
   };
+  
   const renderAllGroups = () => {
     return groups.map((element, index) => {
       return (
@@ -379,22 +492,25 @@ export default function Group() {
           <td>{element.email}</td>
           <td>{element.lastName}</td>
           <td>{element.address}</td>
-          <td>{element.status}</td>
+          <td>{element.role}</td>
+          <td>{element.lockoutEnabled ? "Đang hoạt động" : "Bị Khóa"}</td>
           <td>
             <div
               onClick={() => {
                 var elementTest = document.getElementById("delete-post");
                 elementTest.classList.add("active");
                 setDeleteGroupId(element.id);
+                
+                console.log(element.id)
               }}
               style={{
                 marginBottom: 10,
               }}
               className="button soft-danger"
             >
-              <i className="icofont-trash" />
+              <i className="icofont-pen-alt-1" />
             </div>
-            <div
+            {/* <div
               onClick={() => {
                 var elementTest = document.getElementById("post-new");
                 elementTest.classList.add("active");
@@ -405,7 +521,7 @@ export default function Group() {
               className="button soft-primary"
             >
               <i className="icofont-pen-alt-1" />
-            </div>
+            </div> */}
           </td>
         </tr>
       );
@@ -509,9 +625,7 @@ export default function Group() {
           <span className="hide-search">
             <i className="icofont-close-circled" />
           </span>
-          <form method="post">
-            <input type="text" placeholder="Search..." />
-          </form>
+         
         </div>
       </div>
       {/* responsive header */}
@@ -523,9 +637,9 @@ export default function Group() {
           </div>
           <div className="searches">
             <form method="post">
-              <input type="text" placeholder="Search..." />
+             
               <button type="submit">
-                <i className="icofont-search" />
+                <i className="" />
               </button>
             </form>
           </div>
@@ -772,7 +886,7 @@ export default function Group() {
         <div className="row">
           <div className="col-lg-12">
             <div className="panel-content">
-              <h4 className="main-title">Quản lý người dùng</h4>
+              <h4 className="main-title">Danh Sách người dùng trên hệ thống</h4>
               <button
                 className="main-btn"
                 onClick={() => {
@@ -789,36 +903,15 @@ export default function Group() {
                   marginBottom: 26,
                 }}
               >
-                Tạo tài khoản 
+                Tạo tài khoản Staff
               </button>
 
-              {/* <div className="row merged20 mb-4">
-                <div className="col-lg-12">
-                  <div className="d-widget">
-                    <div className="d-widget-title">
-                      <h5>Tất cả các công ty</h5>
-                    </div>
-                    <table className="table table-default all-events table-striped table-responsive-lg">
-                      <thead>
-                        <tr>
-                          <th>ID#</th>
-                          <th>email</th>
-                          <th>Tên</th>
-                          <th>Sđt</th>
-                          <th>Trạng Thái</th>
-                          <th>Edit</th>
-                        </tr>
-                      </thead>
-                      <tbody>{renderAllGroups()}</tbody>
-                    </table>
-                  </div>
-                </div>
-              </div> */}
+             
               <div className="row merged20 mb-4">
       <div className="col-lg-12">
         <div className="d-widget">
           <div className="d-widget-title">
-            <h5>Danh sách người dùng</h5>
+            <h5>Thông tin</h5>
           </div>
           <table className="table table-default all-events table-striped table-responsive-lg">
             <thead>
@@ -827,7 +920,8 @@ export default function Group() {
                 <th>Email</th>
                 <th>Tên</th>
                 <th>Sđt</th>
-                <th>Trạng Thái</th>
+                <th>Quyền</th>
+                <th>Trạng thái</th>
                 <th>Chỉnh sửa</th>
               </tr>
             </thead>
@@ -1065,8 +1159,15 @@ export default function Group() {
               var element = document.getElementById("post-new");
               element.classList.remove("active");
               setStateAdd("Create");
-              document.getElementById("txtName").value = "";
-              document.getElementById("txtDesciption").value = "";
+
+              document.getElementById("txtFirstName").value = "";
+              document.getElementById("txtLastName").value = "";
+              document.getElementById("txtEmail").value = "";
+              document.getElementById("txtPassword").value = "";
+              document.getElementById("txtAddress").value = "";
+              document.getElementById("txtPhoneNumber").value = "";
+
+              
               //setElementUpdate(undefined);
             }}
             className="popup-closed"
@@ -1104,7 +1205,7 @@ export default function Group() {
                   }}
                   id="popup-head-name"
                 >
-                  Tạo Người Dùng
+                 {stateAdd == "Create" ? "Tạo tài khoản Staff" : "Cập nhật tài khoản Staff"}
                 </p>
               </h5>
             </div>
@@ -1113,6 +1214,8 @@ export default function Group() {
               style={{ width: "100%" }}
               className="c-form"
             >
+              
+                
               <div
                 style={{
                   display: "flex",
@@ -1127,49 +1230,20 @@ export default function Group() {
                     width: "20%",
                   }}
                 >
-                  Chọn quốc gia:{" "}
-                </p>
-                <select
-                  onChange={onChangeSelect}
-                  id="txtSelectCountry"
-                  style={{
-                    padding: 10,
-                    width: "30%",
-                    marginRight: 10,
-                  }}
-                >
-                  <option>Chọn quốc gia</option>
-                  {stateAdd == "Create"
-                    ? renderAllSchool()
-                    : renderAllSchool(schoolEdit)}
-                </select>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  marginTop: 20,
-                  alignItems: "baseline",
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 700,
-                    width: "20%",
-                  }}
-                >
-                  Tên công ty:{" "}
+                  Tên:{" "}
                 </p>
                 <input
                   required
-                  placeholder="Tên của công ty"
+                  placeholder="Nhập tên"
                   style={{
                     width: "100%",
                     padding: 10,
                   }}
-                  id="txtName"
+                  id="txtFirstName"
                 />
               </div>
+
+
               <div
                 style={{
                   display: "flex",
@@ -1177,7 +1251,119 @@ export default function Group() {
                   alignItems: "baseline",
                 }}
               >
-              
+                <p
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    width: "20%",
+                  }}
+                >
+                  Họ:{" "}
+                </p>
+                <input
+                  required
+                  placeholder="Nhập họ"
+                  style={{
+                    width: "100%",
+                    padding: 10,
+                  }}
+                  id="txtLastName"
+                />
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: 20,
+                  alignItems: "baseline",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    width: "20%",
+                  }}
+                >
+                  Email:{" "}
+                </p>
+                <input
+                  required
+                  placeholder="Nhập email:"
+                  style={{
+                    width: "100%",
+                    padding: 10,
+                  }}
+                  id="txtEmail"
+                />
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: 20,
+                  alignItems: "baseline",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    width: "20%",
+                  }}
+                >
+                  Mật khẩu:{" "}
+                </p>
+                <input
+                  required
+                  placeholder="Nhập mật khẩu"
+                  style={{
+                    width: "100%",
+                    padding: 10,
+                  }}
+                  id="txtPassword"
+                />
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: 20,
+                  alignItems: "baseline",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    width: "20%",
+                  }}
+                >
+                  Địa chỉ:{" "}
+                </p>
+                <input
+                  required
+                  placeholder="Nhập địa chỉ:"
+                  style={{
+                    width: "100%",
+                    padding: 10,
+                  }}
+                  id="txtAddress"
+                />
+              </div>
+
+
+
+
+
+
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: 20,
+                  alignItems: "baseline",
+                }}
+              >
               </div>
               <div
                 style={{
@@ -1193,16 +1379,16 @@ export default function Group() {
                     width: "20%",
                   }}
                 >
-                  Mô tả:{" "}
+                  SĐT:{" "}
                 </p>
                 <input
                   required
-                  placeholder="Mô tả của nhóm"
+                  placeholder="Nhập số điện thoại:"
                   style={{
                     width: "100%",
                     padding: 10,
                   }}
-                  id="txtDesciption"
+                  id="txtPhoneNumber"
                 />
               </div>
               <button
@@ -1218,7 +1404,7 @@ export default function Group() {
                   marginRight: "auto",
                 }}
               >
-                Tạo tài khoản
+                {stateAdd == "Create" ? "Tạo tài khoản Staff" : "Cập nhật tài khoản Staff"}
               </button>
             </form>
           </div>
@@ -1244,7 +1430,7 @@ export default function Group() {
                   }}
                   id="popup-head-name"
                 >
-                  Bạn có chắn muốn xóa công ty này ?
+                  Bạn có chắn muốn khoá tài khoản này ?
                 </p>
               </h5>
             </div>
@@ -1282,8 +1468,9 @@ export default function Group() {
                   float: "right",
                 }}
                 onClick={() => deleteAGroup(deleteGroupId)}
+                
               >
-                Xóa
+               Khóa 
               </button>
             </div>
           </div>

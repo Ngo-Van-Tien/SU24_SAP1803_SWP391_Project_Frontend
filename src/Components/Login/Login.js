@@ -23,7 +23,7 @@ export default function Login(props) {
           setErrorAdmin("");
           document.getElementById("user").value = "";
           document.getElementById("password").value = "";
-          props.history.push("/school");
+          props.history.push("/general");
         }
       }
     } catch (err) {

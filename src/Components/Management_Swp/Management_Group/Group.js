@@ -389,7 +389,7 @@ export default function Group() {
             <i className="icofont-close-circled" />
           </span>
           <form method="post">
-            <input type="text" placeholder="Search..." />
+          
           </form>
         </div>
       </div>
@@ -402,9 +402,9 @@ export default function Group() {
           </div>
           <div className="searches">
             <form method="post">
-              <input type="text" placeholder="Search..." />
+            
               <button type="submit">
-                <i className="icofont-search" />
+                <i className="" />
               </button>
             </form>
           </div>

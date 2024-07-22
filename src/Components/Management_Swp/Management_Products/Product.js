@@ -612,7 +612,7 @@ export default function Product() {
             <i className="icofont-close-circled" />
           </span>
           <form method="post">
-            <input type="text" placeholder="Search..." />
+           
           </form>
         </div>
       </div>

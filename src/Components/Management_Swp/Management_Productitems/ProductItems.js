@@ -2,12 +2,15 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import SideBar from "../../Sidebar/SideBar";
 
+
+
 export default function Schools() {
   const [school, setSchools] = useState([]);
   const [quanlity, setQuanlity] = useState(null);
   const [OutOfStock, setOutOfStock] = useState(null);
   const [stateAdd, setStateAdd] = useState("Create");
   const [schoolRecent, setSchoolRecent] = useState([]);
+
 
   const [schoolEdit, setSchoolEdit] = useState(-1);
   const [product, setProduct] = useState([]);
@@ -25,6 +28,7 @@ export default function Schools() {
   const changeSubmit = async (event) => {
     event.preventDefault();
     if (stateAdd == "Create") {
+      
       await addProductItem();
     } else {
       await updateSchool();
@@ -74,6 +78,7 @@ export default function Schools() {
   ;
 
   const getAllSchool = async () => {
+    
     try {
       const response = await axios.get(
         "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/ProductItem/GetAll",
@@ -86,6 +91,7 @@ export default function Schools() {
       );
       if (response.status === 200) {
         setSchools(response.data.data);
+       
       }
     } catch (err) {
       console.error(err);
@@ -143,6 +149,7 @@ export default function Schools() {
 
 
   const getProductitemRecent = async (id) => {
+    
     try {
       const response = await axios.get(
         `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/ProductItem/GetById?id=${id}`,
@@ -161,6 +168,7 @@ export default function Schools() {
         document.getElementById("txtPrice").value = response.data.price;
         document.getElementById("txtSize").value = response.data.size;
         setSchoolEdit(response.data.product.id);
+     
 
       }
     } catch (err) {
@@ -170,6 +178,7 @@ export default function Schools() {
 
 
   const getallProduct = async () => {
+    
     try {
       const response = await axios.get(
         "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/GetAllProduct",
@@ -315,6 +324,7 @@ export default function Schools() {
   const renderSchools = () => {
     return school.map((element, index) => {
       return (
+        
         <tr key={index}>
           <td>{element.id}</td>
           <td>{element.product.name}</td>
@@ -345,8 +355,11 @@ export default function Schools() {
           >
             <i className="icofont-trash" />
           </div>
+          
           <div
             onClick={() => {
+             
+       
               var elementTest = document.getElementById("post-new");
               elementTest.classList.add("active");
               setStateAdd("Update");
@@ -367,6 +380,8 @@ export default function Schools() {
   };
   return (
     <div className="theme-layout">
+      
+      
       <div className="responsive-header">
         <div className="res-logo">
           <img src="images/logo.png" alt="" />
@@ -463,7 +478,7 @@ export default function Schools() {
             <i className="icofont-close-circled" />
           </span>
           <form method="post">
-            <input type="text" placeholder="Search..." />
+        
           </form>
         </div>
       </div>
@@ -476,9 +491,9 @@ export default function Schools() {
           </div>
           <div className="searches">
             <form method="post">
-              <input type="text" placeholder="Search..." />
+             
               <button type="submit">
-                <i className="icofont-search" />
+                <i className="" />
               </button>
             </form>
           </div>
@@ -968,7 +983,7 @@ export default function Schools() {
                   }}
                   id="popup-head-name"
                 >
-                  Tạo Dòng Sữa
+                  {stateAdd == "Create" ? "Tạo Sản Phẩm" : "Cập nhật Sản Phẩm"}
                 </p>
               </h5>
             </div>
@@ -1110,7 +1125,7 @@ export default function Schools() {
                   marginRight: "auto",
                 }}
               >
-                Tạo
+                {stateAdd == "Create" ? "Tạo Sản Phẩm" : "Cập nhật Sản Phẩm"}
               </button>
             </form>
           </div>
