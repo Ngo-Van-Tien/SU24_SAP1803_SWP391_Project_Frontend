@@ -108,7 +108,7 @@ export default function SideBar() {
                     <polygon points="12 15 17 21 7 21 12 15" />
                   </svg>
                 </i>
-                Hệ Thống Sữa Gốc
+                Hệ Thống Sữa 
               </a>
             </Link>
           </li>
@@ -149,7 +149,7 @@ export default function SideBar() {
                     <polygon points="12 15 17 21 7 21 12 15" />
                   </svg>
                 </i>
-                Dòng Sữa
+                Danh Sách Dòng Sữa
               </a>
             </Link>
 

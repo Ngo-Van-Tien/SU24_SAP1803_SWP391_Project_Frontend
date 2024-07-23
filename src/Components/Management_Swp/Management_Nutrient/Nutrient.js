@@ -12,6 +12,8 @@ export default function Nutrient() {
   const [groupRecent, setGroupRecent] = useState({});
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
 
+  
+
   useEffect(async () => {
     await getAllSchool();
     await getAllGroups();
