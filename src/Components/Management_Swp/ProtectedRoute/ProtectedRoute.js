@@ -9,7 +9,7 @@ const getUserRole = () => {
 
 const ProtectedRoute = ({ component: Component, ...rest }) => {
   const userRole = getUserRole();
-  const hasAccess = userRole == 'admin'; // Adjust this condition based on your requirement
+  const hasAccess = userRole == 'Admin'; // Adjust this condition based on your requirement
 
   return (
     <Route

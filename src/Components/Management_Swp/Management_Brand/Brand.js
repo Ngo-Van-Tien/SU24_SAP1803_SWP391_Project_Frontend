@@ -16,6 +16,7 @@ export default function Brand() {
   useEffect(async () => {
     await getAllSchool();
     await getAllGroups();
+    setLoader(false)
   }, []);
 
   const [selectedFile, setSelectedFile] = useState(null);
@@ -69,7 +70,7 @@ export default function Brand() {
         }
 
         const response = await axios.post(
-          "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/AddMilkBrand",
+          "https://swp.somee.com/api/MilkBrand/AddMilkBrand",
           formData,
           {
             headers: {
@@ -116,7 +117,7 @@ const updateGroup = async () => {
       }
 
       const response = await axios.put(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/UpdateMilkBrand`,
+        `https://swp.somee.com/api/MilkBrand/UpdateMilkBrand`,
         formData,
         {
           headers: {
@@ -159,7 +160,7 @@ const updateGroup = async () => {
   const getGroupRecent = async (id) => {
     try {
       const response = await axios.get(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/GetById?id=${id}`,
+        `https://swp.somee.com/api/MilkBrand/GetById?id=${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -188,7 +189,7 @@ const updateGroup = async () => {
   const getAllSchool = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/GetAllCompany",
+        "https://swp.somee.com/api/Company/GetAllCompany",
         {
           headers: {
             Authorization: "Bearer " + localStorage.authorization,
@@ -207,7 +208,7 @@ const updateGroup = async () => {
   const getAllMilkFunction = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkFunction/GetAll",
+        "https://swp.somee.com/api/MilkFunction/GetAll",
         {
           headers: {
             "Content-Type": "application/json",
@@ -271,7 +272,7 @@ const updateGroup = async () => {
   const getAllGroups = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/GetAllMilkBrand",
+        "https://swp.somee.com/api/MilkBrand/GetAllMilkBrand",
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -324,7 +325,7 @@ const updateGroup = async () => {
   const deleteAGroup = async (idGroup) => {
     try {
       const response = await axios.delete(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/DeleteMilkBrand?id=${idGroup}`,
+        `https://swp.somee.com/api/MilkBrand/DeleteMilkBrand?id=${idGroup}`,
         {
           headers: {
             "Content-Type": "application/json",

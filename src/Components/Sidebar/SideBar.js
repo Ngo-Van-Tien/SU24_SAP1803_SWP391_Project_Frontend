@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 export default function SideBar() {
   const [activeId, setActiveId] = useState("txtSchool");
+  const isAdmin =  localStorage.getItem('userRole') == "Admin"
   useEffect(() => {
-    document.getElementById("txtSchool").classList.add("active");
+    
   }, []);
   return (
     <div>
@@ -27,7 +28,7 @@ export default function SideBar() {
 
 
 
-            <Link to="/general">
+           {isAdmin && <Link to="/general">
               <a
                 className
                 style={{
@@ -64,7 +65,7 @@ export default function SideBar() {
                 </i>
                 Báo Cáo
               </a>
-            </Link>
+            </Link>}
           </li>
 
           <li

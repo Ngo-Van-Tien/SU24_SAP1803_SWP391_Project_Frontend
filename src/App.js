@@ -20,6 +20,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
+import ProtectedRoute from "./Components/Management_Swp/ProtectedRoute/ProtectedRoute";
 
 
 const config = {
@@ -51,8 +52,10 @@ function App() {
         <Route path="/order" component={Order} />
         <Route path="/orderDetail" component={OrderDetail} />
         <Route path="/productNutrient" component={ProductNutrient} />
-        <Route path="/general" component={General} />
+        <ProtectedRoute path="/general" component={General} />
+        
         <Route path="/milkebrandfuncion" component={MilkBrandFuncion} />
+        <Route path="/unauthorized" component={()=> <div> unauthorized </div>} />
         
       
         

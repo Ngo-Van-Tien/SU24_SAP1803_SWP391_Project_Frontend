@@ -52,8 +52,8 @@ export default function Order() {
         }
         const response = await axios.post(
           `${(statusUpdate == "CANCEL" && groupRecent.status !="CANCEL")
-             ? "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Order/cancelorder"
-              : "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Order/updatestatus"}`,
+             ? "https://swp.somee.com/api/Order/cancelorder"
+              : "https://swp.somee.com/api/Order/updatestatus"}`,
           formData,
           {
             headers: {
@@ -79,7 +79,7 @@ export default function Order() {
   const getGroupRecent = async (id) => {
     try {
       const response = await axios.get(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Order/GetOrder?id=${id}`,
+        `https://swp.somee.com/api/Order/GetOrder?id=${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -109,7 +109,7 @@ export default function Order() {
   const getAllOrder = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Order/GetAllOrders",
+        "https://swp.somee.com/api/Order/GetAllOrders",
         {
           headers: {
            "Content-Type": "multipart/form-data",

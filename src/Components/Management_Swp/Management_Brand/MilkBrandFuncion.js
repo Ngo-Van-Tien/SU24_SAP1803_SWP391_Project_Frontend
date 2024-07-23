@@ -53,7 +53,7 @@ export default function MilkBrandFuncion() {
         const id = query.get('id');
         
         
-        const nutrientId = document.getElementById("txtSelectMilkBrandFuncion").value;
+        const nutrientId = document.getElementById("txtMilkBrandFuncion").value;
 
         
         const formData = new FormData();
@@ -66,7 +66,7 @@ export default function MilkBrandFuncion() {
         }
 
         const response = await axios.post(
-            "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/addmilkfunctiontomilkbrand",
+            "https://swp.somee.com/api/MilkBrand/addmilkfunctiontomilkbrand",
             formData,
             {
                 headers: {
@@ -81,7 +81,7 @@ export default function MilkBrandFuncion() {
             alert("Thêm chức năng sữa thành công");
             setStateAdd("Create");
 
-            document.getElementById("txtSelectMilkBrandFuncion").value = "";
+            document.getElementById("txtMilkBrandFuncion").value = "";
 
            
             var elementTest = document.getElementById("post-new");
@@ -97,10 +97,9 @@ const updateGroup = async () => {
   try {
     const formData = new FormData();
     formData.append("Id", schoolEdit);
-    formData.append("Name", document.getElementById("txtMilkBrandFuncion").value);
-    
+    formData.append("MilkFunctionId", document.getElementById("txtMilkBrandFuncion").value);
     const response = await axios.post(
-      `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/updatemilkfunctions`,
+      `https://swp.somee.com/api/MilkBrand/updatemilkfunctions`,
       formData,
       {
         headers: {
@@ -130,7 +129,7 @@ const updateGroup = async () => {
         formData.append( "Id",id ); 
 
         const response = await axios.post(
-            `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/getmilkfuntionsbymilkbrandid`, 
+            `https://swp.somee.com/api/MilkBrand/getmilkfuntionsbymilkbrandid`, 
             formData,
             {
                 headers: {
@@ -177,6 +176,7 @@ const updateGroup = async () => {
                 elementTest.classList.add("active");
                 setStateAdd("Update");
                 setSchools([]);
+                setSchoolEdit(element.id);
                 clickToUpdate(element.id);
               }}
               className="button soft-primary"
@@ -193,7 +193,7 @@ const updateGroup = async () => {
   const getallMilkFuncion = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkFunction/GetAll",
+        "https://swp.somee.com/api/MilkFunction/GetAll",
         {
           headers: {
             
@@ -248,7 +248,7 @@ const updateGroup = async () => {
   const getAllGroups = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/GetNutrients",
+        "https://swp.somee.com/api/Nutrient/GetNutrients",
         {
           headers: {
             "Content-Type": "application/json",
@@ -276,7 +276,7 @@ const updateGroup = async () => {
         formData.append("NutrientId", nutrient.id);
 
         const response = await axios.post(
-            `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/deletenutrientsbyproductid`,
+            `https://swp.somee.com/api/Product/deletenutrientsbyproductid`,
             formData,
             {
                 headers: {
@@ -916,7 +916,7 @@ const updateGroup = async () => {
               var element = document.getElementById("post-new");
               element.classList.remove("active");
               setStateAdd("Create");
-              document.getElementById("txtnutrient").value = "";
+              document.getElementById("txtMilkBrandFuncion").value = "";
               
               //setElementUpdate(undefined);
             }}
@@ -983,7 +983,7 @@ const updateGroup = async () => {
                 </p>
                 <select
                   onChange={onChangeSelect}
-                  id="txtSelectMilkBrandFuncion"
+                  id="txtMilkBrandFuncion"
                   style={{
                     padding: 10,
                     width: "30%",
