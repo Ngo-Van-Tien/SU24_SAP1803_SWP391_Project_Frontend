@@ -10,6 +10,7 @@ export default function Group() {
   const [schoolEdit, setSchoolEdit] = useState(-1);
   const [imgNotSave, setImgNotSave] = useState([]);
   const [groupRecent, setGroupRecent] = useState({});
+  const [idRecent, setIdRecent] = useState({});
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
 
   useEffect(async () => {
@@ -71,7 +72,7 @@ export default function Group() {
           formData.append("Image", imageInput.files[0]);
         }
         const response = await axios.post(
-          "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/AddCompany",
+          "https://swp.somee.com/api/Company/AddCompany",
           formData,
           {
             headers: {
@@ -100,26 +101,25 @@ export default function Group() {
     }
   };
   const updateGroup = async () => {
-    if (document.getElementById("txtSelectCountry").value != "Chọn sản phẩm") {
+    if (document.getElementById("txtSelectCountry").value !== "Chọn sản phẩm") {
       try {
         const formData = new FormData();
-        formData.append("Id", schoolEdit);
+        formData.append("Id", idRecent);
         formData.append("Name", document.getElementById("txtName").value);
-        formData.append(
-          "Description",
-          document.getElementById("txtDesciption").value
-        );
-        formData.append(
-          "Nation",
-          document.getElementById("txtSelectCountry").value
-        );
+        formData.append("Description", document.getElementById("txtDesciption").value);
+        formData.append("Nation", document.getElementById("txtSelectCountry").value);
         formData.append("Path", document.getElementById("txtLink").value);
+  
         const imageInput = document.getElementById("txtImage");
         if (imageInput.files.length > 0) {
           formData.append("Image", imageInput.files[0]);
         }
+  
+        console.log(imageInput.files[0]);
+        console.log(idRecent);
+  
         const response = await axios.put(
-          `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/UpdateCompany`,
+          "https://swp.somee.com/api/Company/UpdateCompany",
           formData,
           {
             headers: {
@@ -128,6 +128,7 @@ export default function Group() {
             },
           }
         );
+  
         if (response.status === 200) {
           await getAllGroups();
           alert("Cập nhập công ty thành công ");
@@ -146,10 +147,11 @@ export default function Group() {
       alert("Chọn quốc gia");
     }
   };
+  
   const getGroupRecent = async (id) => {
     try {
       const response = await axios.get(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/GetById?id=${id}`,
+        `https://swp.somee.com/api/Company/GetById?id=${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -158,8 +160,8 @@ export default function Group() {
         }
       );
       if (response.status === 200) {
-        console.log(response.data);
         setGroupRecent(response.data);
+        setIdRecent(id);
         document.getElementById("txtName").value = response.data.company.name;
         document.getElementById("txtDesciption").value =
           response.data.company.description;
@@ -170,6 +172,7 @@ export default function Group() {
           `data:image/png;base64, ${response.data.company.image.content}`
         );
         setSchoolEdit(response.data.company.nation);
+        
         getAllSchool();
       }
     } catch (err) {
@@ -207,8 +210,12 @@ export default function Group() {
   const onChangeSelect = async (event) => {};
   const getAllGroups = async () => {
     try {
+      console.log(localStorage.authorization)
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/GetAllCompany",
+        "https://swp.somee.com/api/Company/GetAllCompany",
+        
+
+    
         {
           headers: {
             "Content-Type": "application/json",
@@ -230,7 +237,7 @@ export default function Group() {
   const deleteAGroup = async (idGroup) => {
     try {
       const response = await axios.delete(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/DeleteCompany?id=${idGroup}`
+        `https://swp.somee.com/api/Company/DeleteCompany?id=${idGroup}`
       );
       if (response.status === 200) {
         document.getElementById("delete-post").classList.remove("active");

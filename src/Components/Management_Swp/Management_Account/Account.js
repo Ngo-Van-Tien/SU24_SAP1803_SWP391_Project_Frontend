@@ -77,7 +77,7 @@ const addGroup = async () => {
       }
 
       const response = await axios.post(
-          "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Account/createstaffaccount",
+          "https://swp.somee.com/api/Account/createstaffaccount",
           formData,
           {
               headers: {
@@ -274,7 +274,7 @@ const addGroup = async () => {
  
   //   try {
   //     const response = await axios.get(
-  //       "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Account/GetAllUser",
+  //       "https://swp.somee.com/api/Account/GetAllUser",
         
   //       {
   //         headers: {
@@ -297,7 +297,7 @@ const addGroup = async () => {
           formData.append('pageNumber', 1);  
           formData.append('pageSize', pageSize); 
       const response = await axios.post(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Account/GetAllUser`, 
+        `https://swp.somee.com/api/Account/GetAllUser`, 
         formData,
         {
           headers: {
@@ -408,7 +408,7 @@ const addGroup = async () => {
       const formData = new FormData();
       formData.append("Id", idGroup);
       const response = await axios.post(
-        'http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Account/LockAccount',
+        'https://swp.somee.com/api/Account/LockAccount',
         formData,
         {
           headers: {

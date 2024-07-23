@@ -56,7 +56,7 @@ export default function General() {
       formData.append("EndDate", formattedEndDate);
       formData.append("Format", difference <= 7 ? "day" : "month");
       const response = await axios.post(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Order/SaleReport`,
+        `https://swp.somee.com/api/Order/SaleReport`,
         formData,
         {
           headers: {
@@ -91,7 +91,7 @@ export default function General() {
       formData.append("StartDay", formattedStartDate);
       formData.append("EndDay", formattedEndDate);
       const response = await axios.post(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Order/getreport`,
+        `https://swp.somee.com/api/Order/getreport`,
         formData,
         {
           headers: {

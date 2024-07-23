@@ -41,7 +41,7 @@ export default function Nutrient() {
 
       console.log(data)
       const response = await axios.post(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/AddNutrient",
+        "https://swp.somee.com/api/Nutrient/AddNutrient",
         formData,
         {
           headers: {
@@ -74,7 +74,7 @@ export default function Nutrient() {
       formData.append('Name', document.getElementById("txtnutrient").value);
       console.log(schoolEdit)
       const response = await axios.put(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/UpdateNutrient`,
+        `https://swp.somee.com/api/Nutrient/UpdateNutrient`,
         formData,
         {
           headers: {
@@ -102,7 +102,7 @@ export default function Nutrient() {
     try {
       console.log(id)
       const response = await axios.get(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/GetByIdNutrient?id=${id}`,
+        `https://swp.somee.com/api/Nutrient/GetByIdNutrient?id=${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -130,7 +130,7 @@ export default function Nutrient() {
   const getAllGroups = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/GetNutrients",
+        "https://swp.somee.com/api/Nutrient/GetNutrients",
         {
           headers: {
             "Content-Type": "application/json",
@@ -151,7 +151,7 @@ export default function Nutrient() {
   const deleteAGroup = async (idGroup) => {
     try {
       const response = await axios.delete(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/DeleteNutrient?id=${idGroup}`,
+        `https://swp.somee.com/api/Nutrient/DeleteNutrient?id=${idGroup}`,
         {
           headers: {
             "Content-Type": "application/json",

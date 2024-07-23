@@ -62,7 +62,7 @@ export default function ProductNutrient() {
         }
        
         const response = await axios.post(
-            "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/Addnutrientsbyproductid",
+            "https://swp.somee.com/api/Product/Addnutrientsbyproductid",
             data,
             {
                 headers: {
@@ -105,7 +105,7 @@ export default function ProductNutrient() {
         formData.append('Name', document.getElementById("txtnutrient").value); 
         console.log(schoolEdit)
         const response = await axios.put(
-          `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/UpdateNutrient`,
+          `https://swp.somee.com/api/Nutrient/UpdateNutrient`,
           formData,
           {
             headers: {
@@ -136,7 +136,7 @@ export default function ProductNutrient() {
         formData.append( "Id",id ); 
 
         const response = await axios.post(
-            `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/getnutrientsbyproductid`, 
+            `https://swp.somee.com/api/Product/getnutrientsbyproductid`, 
             formData,
             {
                 headers: {
@@ -147,13 +147,33 @@ export default function ProductNutrient() {
         );
         if (response.status === 200) {
             setProduct(response.data.data);
-            console.log(response.data.data);
         }
     } catch (err) {
         console.error(err);
     }
 };
+const getNutrientRecent = async (id) => {
+  try {
+    console.log(id)
+    const response = await axios.get(
+      `https://swp.somee.com/api/Nutrient/GetByIdNutrient?id=8df5d701-1dea-4448-0b43-08dcab0d9e5c`,
+      {
+        headers: {
+         
+          Authorization: "Bearer " + localStorage.authorization,
 
+        },
+      }
+    );
+    if (response.status === 200) {
+      document.getElementById("txtNutrient").value = response.data.name;
+      setSchoolEdit(response.data.data.id); 
+      getAllProductNutrient()
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
   const renderProductNutrient = () => {
     return product.map((element, index) => {
       return (
@@ -177,7 +197,7 @@ export default function ProductNutrient() {
               
             </div>
             
-            <div
+            {/* <div
               onClick={() => {
                 var elementTest = document.getElementById("post-new");
                 elementTest.classList.add("active");
@@ -188,7 +208,7 @@ export default function ProductNutrient() {
               className="button soft-primary"
             >
               <i className="icofont-pen-alt-1" />
-            </div>
+            </div> */}
             
           </td>
         </tr>
@@ -199,7 +219,7 @@ export default function ProductNutrient() {
   const getAllNutrient = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/GetNutrients",
+        "https://swp.somee.com/api/Nutrient/GetNutrients",
         {
           headers: {
             
@@ -256,7 +276,7 @@ export default function ProductNutrient() {
   const getAllGroups = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/GetNutrients",
+        "https://swp.somee.com/api/Nutrient/GetNutrients",
         {
           headers: {
             "Content-Type": "application/json",
@@ -282,7 +302,7 @@ export default function ProductNutrient() {
         formData.append("NutrientId", nutrient.id);
 
         const response = await axios.post(
-            `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/deletenutrientsbyproductid`,
+            `https://swp.somee.com/api/Product/deletenutrientsbyproductid`,
             formData,
             {
                 headers: {
@@ -981,7 +1001,7 @@ export default function ProductNutrient() {
                     width: "20%",
                   }}
                 >
-                  Chọn thương hiệu:{" "}
+                  Chọn chất dinh dưỡng:{" "}
                 </p>
                 <select
                   onChange={onChangeSelect}

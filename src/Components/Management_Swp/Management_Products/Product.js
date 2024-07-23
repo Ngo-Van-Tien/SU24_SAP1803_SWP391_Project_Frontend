@@ -80,7 +80,7 @@ export default function Product() {
         }
         
         const response = await axios.post(
-          "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/addproduct",
+          "https://swp.somee.com/api/Product/addproduct",
           formData,
           {
             headers: {
@@ -146,7 +146,7 @@ export default function Product() {
         });
   
         const response = await axios.post(
-          "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/updateproduct",
+          "https://swp.somee.com/api/Product/updateproduct",
           formData,
           {
             headers: {
@@ -196,7 +196,7 @@ export default function Product() {
   const getAllBrand = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/GetAllMilkBrand",
+        "https://swp.somee.com/api/MilkBrand/GetAllMilkBrand",
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -219,7 +219,7 @@ export default function Product() {
     setLoader(false)
     try {
       const response = await axios.get(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/getproduct?id=${id}`,
+        `https://swp.somee.com/api/Product/getproduct?id=${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -251,7 +251,7 @@ export default function Product() {
   const getAllSchool = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkBrand/GetAllMilkBrand",
+        "https://swp.somee.com/api/MilkBrand/GetAllMilkBrand",
         {
           headers: {
             "Content-Type": "application/json",
@@ -276,7 +276,7 @@ export default function Product() {
   const getAllNutrient = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Nutrient/GetNutrients",
+        "https://swp.somee.com/api/Nutrient/GetNutrients",
         {
           headers: {
             "Content-Type": "application/json",
@@ -336,7 +336,7 @@ export default function Product() {
   const getAllGroups = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/GetAllProduct",
+        "https://swp.somee.com/api/Product/GetAllProduct",
         {
           headers: {
             "Content-Type": "application/json",
@@ -414,7 +414,7 @@ export default function Product() {
 
       const response = await axios.delete(
 
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/Delete`,
+        `https://swp.somee.com/api/Product/Delete`,
 
         {
           data: formData,

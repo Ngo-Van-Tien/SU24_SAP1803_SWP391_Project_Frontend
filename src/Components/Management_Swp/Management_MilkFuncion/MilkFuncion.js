@@ -41,7 +41,7 @@ export default function MilkFuncion() {
            
           console.log(data)
           const response = await axios.post(
-            "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkFunction/AddMilkFunction",
+            "https://swp.somee.com/api/MilkFunction/AddMilkFunction",
             formData,
             {
               headers: {
@@ -74,7 +74,7 @@ export default function MilkFuncion() {
         formData.append('Name', document.getElementById("txtmilkfuncion").value); 
         console.log(schoolEdit)
         const response = await axios.put(
-          `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkFunction/UpdateMilkFunction`,
+          `https://swp.somee.com/api/MilkFunction/UpdateMilkFunction`,
           formData,
           {
             headers: {
@@ -101,7 +101,7 @@ export default function MilkFuncion() {
   const getGroupRecent = async (id) => {
     try {
       const response = await axios.get(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkFunction/GetById?id=${id}`,
+        `https://swp.somee.com/api/MilkFunction/GetById?id=${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -129,7 +129,7 @@ export default function MilkFuncion() {
   const getAllGroups = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkFunction/GetAll",
+        "https://swp.somee.com/api/MilkFunction/GetAll",
         {
           headers: {
             "Content-Type": "application/json",
@@ -150,7 +150,7 @@ export default function MilkFuncion() {
   const deleteAGroup = async (idGroup) => {
     try {
       const response = await axios.delete(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/MilkFunction/DeletetMilkFunction?id=${idGroup}`,
+        `https://swp.somee.com/api/MilkFunction/DeletetMilkFunction?id=${idGroup}`,
         {
           headers: {
             "Content-Type": "application/json",

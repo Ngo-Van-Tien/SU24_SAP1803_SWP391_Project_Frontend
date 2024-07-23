@@ -46,7 +46,7 @@ export default function Schools() {
 
 
         const response = await axios.post(
-          "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/ProductItem/add",
+          "https://swp.somee.com/api/ProductItem/add",
           formData,
           {
             headers: {
@@ -81,7 +81,7 @@ export default function Schools() {
     
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/ProductItem/GetAll",
+        "https://swp.somee.com/api/ProductItem/GetAll",
         {
           headers: {
             "Content-Type": "application/json",
@@ -100,7 +100,7 @@ export default function Schools() {
   const getQuanlityCompany = async () => {
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Company/GetQuantity",
+        "https://swp.somee.com/api/Company/GetQuantity",
         {
           headers: {
             Authorization: "Bearer " + localStorage.authorization,
@@ -122,7 +122,7 @@ export default function Schools() {
   const getQuanlityOutofstock = async () => {
     try {
       const response = await axios.post(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/ProductItem/GetQuantityOutOfStock",
+        "https://swp.somee.com/api/ProductItem/GetQuantityOutOfStock",
         {
           headers: {
             Authorization: "Bearer " + localStorage.authorization,
@@ -152,7 +152,7 @@ export default function Schools() {
     
     try {
       const response = await axios.get(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/ProductItem/GetById?id=${id}`,
+        `https://swp.somee.com/api/ProductItem/GetById?id=${id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -181,7 +181,7 @@ export default function Schools() {
     
     try {
       const response = await axios.get(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Product/GetAllProduct",
+        "https://swp.somee.com/api/Product/GetAllProduct",
         {
           headers: {
             "Content-Type": "application/json",
@@ -242,7 +242,7 @@ export default function Schools() {
       }
 
       const response = await axios.put(
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/ProductItem/update`,
+        `https://swp.somee.com/api/ProductItem/update`,
         formData,
         {
           headers: {
@@ -292,7 +292,7 @@ export default function Schools() {
 
       const response = await axios.delete(
 
-        `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/ProductItem/delete`,
+        `https://swp.somee.com/api/ProductItem/delete`,
 
         {
           data: formData,

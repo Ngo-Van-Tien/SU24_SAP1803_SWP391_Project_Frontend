@@ -5,6 +5,9 @@ export default function Login(props) {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [errorAdmin, setErrorAdmin] = useState("");
+  useEffect(()=>{
+    localStorage.clear();
+  },[])
   const submitLogin = async (event) => {
     event.preventDefault();
     try {
@@ -12,7 +15,7 @@ export default function Login(props) {
       formData.append('Email', username);
       formData.append('Password', password);
       const response = await axios.post(
-        "http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Account/Login",
+        "https://swp.somee.com/api/Account/Login",
         formData
       );
       if (response.status === 200) {
@@ -20,10 +23,11 @@ export default function Login(props) {
           setErrorAdmin("Tài khoản mật khẩu không đúng");
         } else {
           localStorage.setItem("authorization", response.data.token);
+          localStorage.setItem("userRole", "Admin");
           setErrorAdmin("");
           document.getElementById("user").value = "";
           document.getElementById("password").value = "";
-          props.history.push("/general");
+          props.history.push("/group");
         }
       }
     } catch (err) {

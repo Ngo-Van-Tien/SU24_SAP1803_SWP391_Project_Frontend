@@ -18,7 +18,7 @@ export default function OrderDetail() {
     const getGroupRecent = async () => {
         try {
           const response = await axios.get(
-            `http://development.eba-5na7jw5m.ap-southeast-1.elasticbeanstalk.com/api/Order/GetOrder?id=${id}`,
+            `https://swp.somee.com/api/Order/GetOrder?id=${id}`,
             {
               headers: {
                 "Content-Type": "application/json",
