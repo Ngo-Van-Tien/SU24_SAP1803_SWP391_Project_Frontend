@@ -16,6 +16,7 @@ export default function Group() {
   useEffect(async () => {
     await getAllSchool();
     await getAllGroups();
+    document.getElementById("txtSchool").classList.add("active");
   }, []);
 
   const [selectedFile, setSelectedFile] = useState(null);

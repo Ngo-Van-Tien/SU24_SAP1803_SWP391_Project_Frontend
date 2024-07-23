@@ -429,14 +429,13 @@ export default function OrderDetail() {
         <div className="info-section">
           <h5>Thông Tin Khách Hàng</h5>
           <p>{order && order.address}</p>
-          <p>Số Điện Thoại: 08454734646</p>
-          <p>Email: 08454734646example@gmail.com</p>
+          <p>Số Điện Thoại: {order && order.phoneNumber}</p>
+          
         </div>
         <div className="info-section">
           <h5>Hóa Đơn #249</h5>
           <p>{order && order.id}</p>
-          <p>Ngày Thanh Toán: </p>
-          <p>Mã Giao Dịch:</p>
+          
         </div>
       </div>
       <div className="table-container">
@@ -447,7 +446,7 @@ export default function OrderDetail() {
               <th>Tên Sữa</th>
               <th>Số Lượng</th>
               <th>Giá</th>
-              <th>Tổng Phụ</th>
+              <th>Tổng Tiền</th>
             </tr>
           </thead>
           <tbody>
@@ -461,12 +460,7 @@ export default function OrderDetail() {
           <p>Thanh toán thông qua VNpay</p>
           <p>Đơn hàng này đã được thanh toán</p>
         </div>
-        <div className="order-summary">
-          <h5>Tóm tắt tổng đơn hàng</h5>
-          <p>Tổng Phụ: 50.000 VND</p>
-          <p>Phí Vận Chuyển: 10.000 VND</p>
-          <p>Tổng: 60.000 VND</p>
-        </div>
+        
       </div>
       <div className="footer">
         <button className="back-button" onClick={handleBackClick}>Quay Lại</button>

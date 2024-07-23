@@ -14,10 +14,12 @@ export default function ProductNutrient() {
   const [schools, setSchools] = useState([]);
   const [stateAdd, setStateAdd] = useState("Create");
   const [schoolEdit, setSchoolEdit] = useState(-1);
+  const [nutrientlEdit, setNutrientEdit] = useState(-1);
 
   const [groupRecent, setGroupRecent] = useState({});
   const [deleteGroupId, setDeleteGroupId] = useState(-1);
   const [nutrient, setNutrient] = useState([]);
+
   const onChangeSelect = async (event) => {
   };
 
@@ -101,7 +103,7 @@ export default function ProductNutrient() {
       try {
         
         const formData = new FormData();
-        formData.append('Id', schoolEdit); 
+        formData.append('Id', nutrientlEdit); 
         formData.append('Name', document.getElementById("txtnutrient").value); 
         console.log(schoolEdit)
         const response = await axios.put(
@@ -156,7 +158,7 @@ const getNutrientRecent = async (id) => {
   try {
     console.log(id)
     const response = await axios.get(
-      `https://swp.somee.com/api/Nutrient/GetByIdNutrient?id=8df5d701-1dea-4448-0b43-08dcab0d9e5c`,
+      `https://swp.somee.com/api/Nutrient/GetByIdNutrient?id=${id}`,
       {
         headers: {
          
@@ -168,6 +170,7 @@ const getNutrientRecent = async (id) => {
     if (response.status === 200) {
       document.getElementById("txtNutrient").value = response.data.name;
       setSchoolEdit(response.data.data.id); 
+
       getAllProductNutrient()
     }
   } catch (err) {
@@ -203,6 +206,7 @@ const getNutrientRecent = async (id) => {
                 elementTest.classList.add("active");
                 setStateAdd("Update");
                 setSchools([]);
+                setNutrientEdit(element.id)
                 clickToUpdate(element.id);
               }}
               className="button soft-primary"

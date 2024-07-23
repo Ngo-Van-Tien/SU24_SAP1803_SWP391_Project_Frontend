@@ -554,7 +554,7 @@ export default function General() {
                       }}
                     />
                   )}
-                  <div className="table-container">
+                  {/* <div className="table-container">
                     <table className="tb_od">
                       <thead>
                         <tr>
@@ -567,8 +567,8 @@ export default function General() {
                       </thead>
                       <tbody>{order && renderAllOrder()}</tbody>
                     </table>
-                  </div>
-                  <div className="summary">
+                  </div> */}
+                  {/* <div className="summary">
                     <div className="payment-method">
                       <h5>Phương Thức Thanh Toán:</h5>
                       <p>Thanh toán thông qua VNpay</p>
@@ -580,7 +580,7 @@ export default function General() {
                       <p>Phí Vận Chuyển: 10.000 VND</p>
                       <p>Tổng: 60.000 VND</p>
                     </div>
-                  </div>
+                  </div> */}
                   <div className="footer">
                     <button className="back-button" onClick={handleBackClick}>
                       Quay Lại
