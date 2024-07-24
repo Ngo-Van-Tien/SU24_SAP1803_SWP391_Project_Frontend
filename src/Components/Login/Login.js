@@ -129,11 +129,11 @@ export default function Login(props) {
                       Confirm password
                     </label>
                   </div>
-                  <button type="submit" className="form__button">
+                  {/* <button type="submit" className="form__button">
                     Register
-                  </button>
+                  </button> */}
                   <p className="form__text">
-                    Already have an account?
+                    
                     <label htmlFor="toggle" className="form__link">
                       Sign in!
                     </label>
