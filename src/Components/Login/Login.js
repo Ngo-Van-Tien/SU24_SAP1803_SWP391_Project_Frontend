@@ -23,7 +23,7 @@ export default function Login(props) {
           setErrorAdmin("Tài khoản mật khẩu không đúng");
         } else {
           localStorage.setItem("authorization", response.data.token);
-          localStorage.setItem("userRole", "Admin");
+          localStorage.setItem("userRole", response.data.role);
           setErrorAdmin("");
           document.getElementById("user").value = "";
           document.getElementById("password").value = "";
